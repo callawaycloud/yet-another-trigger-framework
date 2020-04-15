@@ -6,12 +6,16 @@
             "package": "CCC Trigger Handler",
             "versionName": "ver 0.1",
             "versionNumber": "0.1.0.NEXT"
+        },
+        {
+            "path": "support"
         }
     ],
     "namespace": "",
     "sfdcLoginUrl": "https://login.salesforce.com",
     "sourceApiVersion": "48.0",
     "packageAliases": {
-        "CCC Trigger Handler": "0Ho1C000000002RSAQ"
+        "CCC Trigger Handler": "0Ho1C000000002RSAQ",
+        "CCC Trigger Handler@0.1.0-1": "04t1C000000goLRQAY"
     }
 }
