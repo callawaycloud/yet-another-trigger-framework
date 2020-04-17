@@ -72,16 +72,17 @@ public class TriggerHandler {
     }
   }
 
-  private static Set<String> disabledObjects;
-  private static Set<String> disabledHandlers;
-  private static Map<String, Set<String>> disabledObjectHandlers;
-  private static void cacheTriggerControl() {
-    disabledObjects = new Set<String>();
-    disabledHandlers = new Set<String>();
-    disabledObjectHandlers = new Map<String, Set<String>>();
-    for (
-      Trigger_Control__c triggerControl : Trigger_Control__c.getAll().values()
-    ) {
+  private static Set<String> disabledObjects = new Set<String>();
+  private static Set<String> disabledHandlers = new Set<String>();
+  private static Map<String, Set<String>> disabledObjectHandlers = new Map<String, Set<String>>();
+  @TestVisible
+  private static void cacheTriggerControl(
+    Trigger_Control__mdt[] triggerControls
+  ) {
+    disabledObjects.clear();
+    disabledHandlers.clear();
+    disabledObjectHandlers.clear();
+    for (Trigger_Control__mdt triggerControl : triggerControls) {
       String objectName = triggerControl.Object__c == null
         ? null
         : triggerControl.Object__c.toLowerCase();
@@ -101,7 +102,7 @@ public class TriggerHandler {
     }
   }
   static {
-    cacheTriggerControl();
+    cacheTriggerControl([SELECT Class__c, Object__c FROM Trigger_Control__mdt]);
   }
 
   private Boolean objectDisabled(String xSObjType) {
@@ -123,10 +124,10 @@ public class TriggerHandler {
   private String sObjectType {
     get {
       if (sObjectType == null) {
-        if (Trigger.new != null) {
-          sObjectType = getSObjectType(Trigger.new[0]);
-        } else {
+        if (Trigger.isDelete) {
           sObjectType = getSObjectType(Trigger.old[0]);
+        } else {
+          sObjectType = getSObjectType(Trigger.new[0]);
         }
       }
       return sObjectType;

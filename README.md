@@ -12,6 +12,7 @@
 - readme with usage instructions
 - useful descriptions/help text on fields and objects
 - code commenting and formatting
+- add validation rule to require at least one field on metadata to be set
 
 ## Other General
 
