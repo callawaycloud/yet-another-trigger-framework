@@ -25,12 +25,15 @@ public class TriggerContext {
 
       isExecuting = true;
       this.operationType = operationType;
-      if(newRecords != null){
-        this.newRecords = newRecords;
+      this.newRecords = newRecords;
+
+      //not sure if this works for upsert?
+      if(newRecords != null && newRecords.size() > 0 && newRecords[0].Id != null){
         this.newRecordMap = new Map<Id, SObject>(newRecords);
       }
+
+      this.oldRecords = oldRecords;
       if(oldRecords != null){
-        this.oldRecords = oldRecords;
         this.oldRecordMap = new Map<Id, SObject>(oldRecords);
       }
       size = newRecords != null ? newRecords.size() : oldRecords.size();
