@@ -1,6 +1,6 @@
-public without sharing class Handler1 implements TriggerHandler.HandlerInterface {
+public without sharing class Handler1 extends BaseTriggerHandler {
   public void handle() {
-    for (SObject sObj : Trigger.new) {
+    for (SObject sObj : context.newRecords) {
       sObj.put('Handler1__c', true);
     }
   }

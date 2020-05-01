@@ -63,9 +63,13 @@ public class TriggerHandler {
 
         List<HandlerInterface> handlers = eventHandlerMapping.get(ev.name());
 
+        TriggerContext ctx = new TriggerContext();
         if (handlers != null && !handlers.isEmpty()) {
             for (HandlerInterface h : handlers) {
                 if (!handlerDisabled(h) && !objectHandlerDisabled(sObjectType, h)) {
+                    if(h instanceOf BaseTriggerHandler){
+                      ((BaseTriggerHandler) h).context = ctx;
+                    }
                     h.handle();
                 }
             }
