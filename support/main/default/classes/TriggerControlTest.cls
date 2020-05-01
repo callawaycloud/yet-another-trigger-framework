@@ -94,6 +94,8 @@ private class TriggerControlTest {
   // NB: current version replaces all trigger controls with each call, which
   // is plenty for the current test methods
   private static void disable(String objectName, String handlerClassName) {
+      // NEED TO REPLACE WITH NEW METADATA
+      /*
     TriggerHandler.cacheTriggerControl(
       new List<Trigger_Control__mdt>{
         new Trigger_Control__mdt(
@@ -102,6 +104,7 @@ private class TriggerControlTest {
         )
       }
     );
+	*/
   }
 
   private static void checkContact(Id contactId, Boolean handler1Fired) {

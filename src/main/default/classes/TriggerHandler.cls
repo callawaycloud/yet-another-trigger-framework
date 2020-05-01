@@ -70,7 +70,7 @@ public class TriggerHandler {
 
         if (handlers != null && !handlers.isEmpty()) {
             for (HandlerInterface h : handlers) {
-                if (!handlerDisabled(h) && !objectHandlerDisabled(sObjectType, h)) {
+                if (!objectHandlerDisabled(sObjectType, h)) {
                     h.handle();
                 }
             }
@@ -80,20 +80,48 @@ public class TriggerHandler {
     private void doAutomaticBinding(String sObjName){
         for(Trigger_Object__mdt triggerObj : configMetadata){
             if(sObjName == triggerObj.Object__c){
-                for(Trigger_Handler__c handler : triggerObj.Trigger_Handler__r){
-                    if(After_Insert__c){
-                        try{
-                            Type t = Type.forName(handler.Handler_Class__c);
-                        } catch {
-                            // friendly non-exploding notificaiton?
-                            System.debug('Looks like you accidently made up a thing that doesnt exist');
-                        }
-                        Shape newObj = (Shape)t.newInstance();
-                        bind(Evt.afterInsert, (HandlerInterface) )
+                for(Trigger_Handler__mdt handler : triggerObj.Trigger_Handlers__r){
+                    if(!handler.Auto_Bind__c){
+                        continue;
+                    }
+                    Type t = getType(handler.Handler_Class__c);
+                    HandlerInterface handlerClass = (HandlerInterface) t.newInstance();
+                    if(handler.Before_Insert__c){
+                        bind(Evt.beforeInsert, handlerClass);
+                    }
+                    if(handler.After_Insert__c){
+                        bind(Evt.afterInsert, handlerClass);
+                    }
+                    if(handler.Before_Update__c){
+                        bind(Evt.beforeUpdate, handlerClass);
+                    }
+                    if(handler.After_Update__c){
+                        bind(Evt.afterUpdate, handlerClass);
+                    }
+                    if(handler.Before_Delete__c){
+                        bind(Evt.beforeDelete, handlerClass);
+                    }
+                    if(handler.After_Delete__c){
+                        bind(Evt.afterDelete, handlerClass);
+                    }
+                    if(handler.After_Undelete__c){
+                        bind(Evt.afterUndelete, handlerClass);
                     }
                 }
             }
         }
+    }
+
+    private Type getType(String className){
+        Type t;
+        try{
+            t = Type.forName(className);
+        } catch (Exception e){
+            // friendly non-exploding notificaiton?
+            System.debug(className + '? Looks like you accidently made up a thing that doesnt exist.');
+            System.debug(e.getMessage());
+        }
+        return t;
     }
 
     private static Set<String> disabledObjects = new Set<String>();
@@ -116,11 +144,12 @@ public class TriggerHandler {
                         Before_Insert__c,
                         After_Insert__c,
                         Before_Delete__c,
+                        After_Delete__c,
                         After_Undelete__c,
                         Before_Update__c,
                         After_Update__c
                     from
-                        Trigger_Handler__r
+                        Trigger_Handlers__r
                     order by
                         Execution_Order__c
                     )
@@ -152,11 +181,11 @@ public class TriggerHandler {
         disabledHandlers.clear();
         disabledObjectHandlers.clear();
         for (Trigger_Object__mdt triggerObject : triggerObjects) {
-            String objectName = triggerObject.Object__c == null ? null : triggerControl.Object__c.toLowerCase();
+            String objectName = triggerObject.Object__c == null ? null : triggerObject.Object__c.toLowerCase();
             if(!triggerObject.Enabled__c){
                 disabledObjects.add(objectName);
             }
-            for(Trigger_Handler__mdt handler : triggerObject.Trigger_Handler__r){
+            for(Trigger_Handler__mdt handler : triggerObject.Trigger_Handlers__r){
                 String handlerName = handler.Handler_Class__c == null ? null : handler.Handler_Class__c.toLowerCase();
                 if(!handler.Enabled__c){
                     if (!disabledObjectHandlers.containsKey(objectName)) {

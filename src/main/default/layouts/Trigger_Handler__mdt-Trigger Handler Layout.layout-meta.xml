@@ -58,6 +58,10 @@
                 <behavior>Edit</behavior>
                 <field>Enabled__c</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>After_Delete__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
