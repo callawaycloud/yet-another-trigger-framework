@@ -85,6 +85,10 @@ public class TriggerHandler {
                         continue;
                     }
                     Type t = getType(handler.Handler_Class__c);
+                    if(t == null){
+                        System.debug(handler.Handler_Class__c + '? Looks like that handler class does not exist!');
+                        continue;
+                    }
                     HandlerInterface handlerClass = (HandlerInterface) t.newInstance();
                     if(handler.Before_Insert__c){
                         bind(Evt.beforeInsert, handlerClass);
@@ -115,10 +119,9 @@ public class TriggerHandler {
     private Type getType(String className){
         Type t;
         try{
-            t = Type.forName(className);
+            t = Type.forName(className); // doesn't throw exception if invalid name!
         } catch (Exception e){
             // friendly non-exploding notificaiton?
-            System.debug(className + '? Looks like you accidently made up a thing that doesnt exist.');
             System.debug(e.getMessage());
         }
         return t;

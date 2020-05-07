@@ -1,5 +1,7 @@
 @isTest
 private class TriggerControlTest {
+  private static final TestRecordJSON =
+
   @isTest
   private static void testNoControl() {
     Boolean acctHandler1Fired = true;
@@ -93,7 +95,14 @@ private class TriggerControlTest {
 
   // NB: current version replaces all trigger controls with each call, which
   // is plenty for the current test methods
-  private static void disable(String objectName, String handlerClassName) {
+  private static Trigger_Object__mdt generateObjMetadata(String objName, Boolean enabled){
+    Trigger_Object__mdt trig_obj = new Trigger_Object__mdt(
+      Object__c = objName,
+      Enabled__c = enabled
+    );
+  }
+  private static void disableObj(String objectName, String handlerClassName) {
+    TriggerHandler.
       // NEED TO REPLACE WITH NEW METADATA
       /*
     TriggerHandler.cacheTriggerControl(

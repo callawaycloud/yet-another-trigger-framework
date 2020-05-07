@@ -8,7 +8,8 @@ trigger AccountMaster on Account(
   before delete
 ) {
   TriggerHandler handler = new TriggerHandler();
-  handler.bind(TriggerHandler.Evt.beforeInsert, new Handler1());
-  handler.bind(TriggerHandler.Evt.beforeInsert, new Handler2());
+
+  handler.bind(TriggerHandler.Evt.beforeUpdate, new Handler1());
+  //handler.bind(TriggerHandler.Evt.beforeInsert, new Handler2());
   handler.manage();
 }
