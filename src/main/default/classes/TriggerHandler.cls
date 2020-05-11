@@ -21,6 +21,16 @@ public class TriggerHandler {
         void handle();
     }
 
+    public TriggerConfigService.ObjectConfig objectConfig {
+        get {
+            if(objectConfig == null){
+                objectConfig = TriggerConfigService.getConfig(sObjectType);
+            }
+            return objectConfig;
+        }
+        set;
+    }
+
     // Internal mapping of handlers
     Map<String, List<HandlerInterface>> eventHandlerMapping = new Map<String, List<HandlerInterface>>();
 
@@ -127,94 +137,9 @@ public class TriggerHandler {
         return t;
     }
 
-    private static Set<String> disabledObjects = new Set<String>();
-    private static Set<String> disabledHandlers = new Set<String>();
-    private static Map<String, Set<String>> disabledObjectHandlers = new Map<String, Set<String>>();
-
-    private static Trigger_Object__mdt[] configMetadata {
-        get {
-            if(configMetadata == null){
-                configMetadata = [
-                SELECT
-                    Object__c,
-                    Enabled__c,
-                    (
-                    select
-                        Handler_Class__c,
-                        Auto_Bind__c,
-                        Enabled__c,
-                        Execution_Order__c,
-                        Before_Insert__c,
-                        After_Insert__c,
-                        Before_Delete__c,
-                        After_Delete__c,
-                        After_Undelete__c,
-                        Before_Update__c,
-                        After_Update__c
-                    from
-                        Trigger_Handlers__r
-                    order by
-                        Execution_Order__c
-                    )
-                FROM
-                    Trigger_Object__mdt
-                ];
-            }
-            return configMetadata;
-        }
-        set;
-    }
-
-    // Build a wrapper for this? Feels messy.
-    // @TestVisible
-    // private class ConfigMetadata{
-    //     String ObjectName;
-    //     String ClassName;
-
-    //     @TestVisible
-    //     private ConfigMetadata(Trigger_Object__mdt triggerObj){
-
-    //     }
-    // }
-
-    @TestVisible
-    private static void cacheTriggerControl() {
-        Trigger_Object__mdt[] triggerObjects = configMetadata;
-        disabledObjects.clear();
-        disabledHandlers.clear();
-        disabledObjectHandlers.clear();
-        for (Trigger_Object__mdt triggerObject : triggerObjects) {
-            String objectName = triggerObject.Object__c == null ? null : triggerObject.Object__c.toLowerCase();
-            if(!triggerObject.Enabled__c){
-                disabledObjects.add(objectName);
-            }
-            for(Trigger_Handler__mdt handler : triggerObject.Trigger_Handlers__r){
-                String handlerName = handler.Handler_Class__c == null ? null : handler.Handler_Class__c.toLowerCase();
-                if(!handler.Enabled__c){
-                    if (!disabledObjectHandlers.containsKey(objectName)) {
-                        disabledObjectHandlers.put(objectName, new Set<String>());
-                    }
-                    disabledObjectHandlers.get(objectName).add(handlerName);
-                }
-            }
-        }
-    }
-    static{
-        cacheTriggerControl();
-    }
-
     private Boolean objectDisabled(String xSObjType) {
         return disabledObjects.contains(xSObjType);
     }
-
-    // Handlers are required to have objects defined
-    // They will only ever be running in the context of a single object at a time even if used in multiple triggers
-    // To disable the handler on 2 objects, would need to disable against both objects in the 2 individual handler records
-    /*
-    private Boolean handlerDisabled(HandlerInterface h) {
-        return disabledHandlers.contains(getHandlerName(h));
-    }
-    */
 
     private Boolean objectHandlerDisabled(String xSObjectType, HandlerInterface h) {
         return disabledObjectHandlers.containsKey(xSObjectType) &&

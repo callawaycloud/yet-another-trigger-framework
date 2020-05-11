@@ -8,6 +8,6 @@ trigger ContactMaster on Contact(
   before delete
 ) {
   TriggerHandler handler = new TriggerHandler();
-  handler.bind(TriggerHandler.Evt.beforeInsert, new Handler1());
+  //handler.bind(TriggerHandler.Evt.beforeInsert, new Handler1());
   handler.manage();
 }
