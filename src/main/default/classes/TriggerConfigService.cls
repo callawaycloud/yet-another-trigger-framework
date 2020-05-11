@@ -1,18 +1,16 @@
 public class TriggerConfigService {
-
-    public static ObjectConfig getConfig(String objName){
+    public static ObjectConfig getConfig(String objName) {
         String lowercaseObjName = objName.toLowerCase();
-        if(!configMetadata.keySet().contains(lowercaseObjName)){
+        if (!configMetadata.keySet().contains(lowercaseObjName)) {
             return null;
         }
 
-        return new ObjectConfig(configMetadata.get(lowercaseObjName));
+        return configMetadata.get(lowercaseObjName);
     }
 
-    @testVisible
-    private static Map<String,ObjectConfig> configMetadata {
+    public static Map<String, ObjectConfig> configMetadata {
         get {
-            if(configMetadata == null){
+            if (configMetadata == null) {
                 configMetadata = buildConfigMap();
             }
             return configMetadata;
@@ -20,84 +18,71 @@ public class TriggerConfigService {
         set;
     }
 
-    private static Map<String,ObjectConfig> buildConfigMap(){
-        Trigger_Object__mdt[] allMtd =
-        [SELECT Object__c,
-            Enabled__c,
-            (
-            select
-                Handler_Class__c,
-                Auto_Bind__c,
+    // @testvisible
+    // private static void overrideHandlerEnabled(String objectName, String className) {
+    // }
+    @testVisible
+    private static Map<String, ObjectConfig> buildConfigMap() {
+        Trigger_Object__mdt[] allMtd = [
+            SELECT
+                Object__c,
                 Enabled__c,
-                Execution_Order__c,
-                Before_Insert__c,
-                After_Insert__c,
-                Before_Delete__c,
-                After_Delete__c,
-                After_Undelete__c,
-                Before_Update__c,
-                After_Update__c
-            from
-                Trigger_Handlers__r
-            order by
-                Execution_Order__c
-            )
-        FROM
-            Trigger_Object__mdt
+                (
+                    SELECT
+                        Handler_Class__c,
+                        Auto_Bind__c,
+                        Enabled__c,
+                        Execution_Order__c,
+                        Before_Insert__c,
+                        After_Insert__c,
+                        Before_Delete__c,
+                        After_Delete__c,
+                        After_Undelete__c,
+                        Before_Update__c,
+                        After_Update__c
+                    FROM Trigger_Handlers__r
+                    ORDER BY Execution_Order__c ASC
+                )
+            FROM Trigger_Object__mdt
         ];
-        Map<String,ObjectConfig> resultsMap = new Map<String,ObjectConfig>();
-        for(Trigger_Object__mdt objMdt : allMtd){
+        Map<String, ObjectConfig> resultsMap = new Map<String, ObjectConfig>();
+        for (Trigger_Object__mdt objMdt : allMtd) {
             resultsMap.put(objMdt.Object__c, new ObjectConfig(objMdt));
         }
         return resultsMap;
     }
 
-    public static Set<String> disabledObjects = new Set<String>();
-    public static Map<String, Set<String>> disabledObjectHandlers = new Map<String, Set<String>>();
+    public class ObjectConfig {
+        public String objName;
+        public Boolean enabled;
+        public Map<String, HandlerConfig> handlers;
+        public String[] handlerOrder;
+        public Set<String> disabledHandlers;
 
-    @TestVisible
-    private static void cacheDesabledTypes() {
-        disabledObjects.clear();
-        disabledObjectHandlers.clear();
-        for (Trigger_Object__mdt triggerObject : configMetadata.values()) {
-            String objectName = triggerObject.Object__c == null ? null : triggerObject.Object__c.toLowerCase();
-            if(!triggerObject.Enabled__c){
-                disabledObjects.add(objectName);
-            }
-            for(Trigger_Handler__mdt handler : triggerObject.Trigger_Handlers__r){
-                String handlerName = handler.Handler_Class__c == null ? null : handler.Handler_Class__c.toLowerCase();
-                if(!handler.Enabled__c){
-                    if (!disabledObjectHandlers.containsKey(objectName)) {
-                        disabledObjectHandlers.put(objectName, new Set<String>());
-                    }
-                    disabledObjectHandlers.get(objectName).add(handlerName);
+        public ObjectConfig() {
+            handlers = new Map<String, HandlerConfig>{};
+            disabledHandlers = new Set<String>();
+            handlerOrder = new List<String>{};
+        }
+
+        public ObjectConfig(Trigger_Object__mdt objMdt) {
+            objName = objMdt.Object__c.toLowerCase();
+            enabled = objMdt.Enabled__c;
+            handlers = new Map<String, HandlerConfig>{};
+            disabledHandlers = new Set<String>();
+            handlerOrder = new List<String>{};
+
+            for (Trigger_Handler__mdt th : objMdt.Trigger_Handlers__r) {
+                handlers.put(th.Handler_Class__c, new HandlerConfig(th));
+                handlerOrder.add(th.Handler_Class__c);
+                if (!th.Enabled__c) {
+                    disabledHandlers.add(th.Handler_Class__c);
                 }
             }
         }
     }
-    static{
-        cacheDesabledTypes();
-    }
 
-    public class ObjectConfig{
-        String objName;
-        Boolean enabled;
-        HandlerConfig[] handlers;
-
-        public ObjectConfig(){}
-
-        public ObjectConfig(Trigger_Object__mdt objMdt){
-            objName = objMdt.Object__c.toLowerCase();
-            enabled = objMdt.Enabled__c;
-            handlers = new HandlerConfig[]{};
-
-            for(Trigger_Handler__mdt th: objMdt.Trigger_Handlers__r){
-                handlers.add(new HandlerConfig(th));
-            }
-        }
-    }
-
-    public class HandlerConfig{
+    public class HandlerConfig {
         public String className;
         public Boolean autoBind;
         public Boolean enabled;
@@ -110,9 +95,10 @@ public class TriggerConfigService {
         public Boolean afterDelete;
         public Boolean afterUndelete;
 
-        public HandlerConfig(){}
+        public HandlerConfig() {
+        }
 
-        public HandlerConfig(Trigger_Handler__mdt th){
+        public HandlerConfig(Trigger_Handler__mdt th) {
             className = th.Handler_Class__c.toLowerCase();
             autoBind = th.Auto_Bind__c;
             enabled = th.Enabled__c;
