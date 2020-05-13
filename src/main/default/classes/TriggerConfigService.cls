@@ -1,13 +1,4 @@
 public class TriggerConfigService {
-    public static ObjectConfig getConfig(String objName) {
-        String lowercaseObjName = objName.toLowerCase();
-        if (!configMetadata.keySet().contains(lowercaseObjName)) {
-            return null;
-        }
-
-        return configMetadata.get(lowercaseObjName);
-    }
-
     public static Map<String, ObjectConfig> configMetadata {
         get {
             if (configMetadata == null) {
@@ -18,19 +9,15 @@ public class TriggerConfigService {
         set;
     }
 
-    // @testvisible
-    // private static void overrideHandlerEnabled(String objectName, String className) {
-    // }
     @testVisible
     private static Map<String, ObjectConfig> buildConfigMap() {
         Trigger_Object__mdt[] allMtd = [
             SELECT
-                Object__c,
+                DeveloperName,
                 Enabled__c,
                 (
                     SELECT
                         Handler_Class__c,
-                        Auto_Bind__c,
                         Enabled__c,
                         Execution_Order__c,
                         Before_Insert__c,
@@ -47,7 +34,9 @@ public class TriggerConfigService {
         ];
         Map<String, ObjectConfig> resultsMap = new Map<String, ObjectConfig>();
         for (Trigger_Object__mdt objMdt : allMtd) {
-            resultsMap.put(objMdt.Object__c, new ObjectConfig(objMdt));
+            resultsMap.put(objMdt.DeveloperName.toLowerCase(), new ObjectConfig(objMdt));
+        }
+        if (allMtd.size() == 0) {
         }
         return resultsMap;
     }
@@ -55,36 +44,28 @@ public class TriggerConfigService {
     public class ObjectConfig {
         public String objName;
         public Boolean enabled;
-        public Map<String, HandlerConfig> handlers;
-        public String[] handlerOrder;
-        public Set<String> disabledHandlers;
+        public Map<String, HandlerConfig> handlers = new Map<String, HandlerConfig>{};
+        public String[] handlerOrder = new List<String>{};
 
         public ObjectConfig() {
-            handlers = new Map<String, HandlerConfig>{};
-            disabledHandlers = new Set<String>();
-            handlerOrder = new List<String>{};
         }
 
         public ObjectConfig(Trigger_Object__mdt objMdt) {
-            objName = objMdt.Object__c.toLowerCase();
+            objName = objMdt.DeveloperName.toLowerCase();
             enabled = objMdt.Enabled__c;
             handlers = new Map<String, HandlerConfig>{};
-            disabledHandlers = new Set<String>();
             handlerOrder = new List<String>{};
 
             for (Trigger_Handler__mdt th : objMdt.Trigger_Handlers__r) {
-                handlers.put(th.Handler_Class__c, new HandlerConfig(th));
-                handlerOrder.add(th.Handler_Class__c);
-                if (!th.Enabled__c) {
-                    disabledHandlers.add(th.Handler_Class__c);
-                }
+                String handlerName = th.Handler_Class__c.toLowerCase();
+                handlers.put(handlerName, new HandlerConfig(th));
+                handlerOrder.add(handlerName);
             }
         }
     }
 
     public class HandlerConfig {
         public String className;
-        public Boolean autoBind;
         public Boolean enabled;
         public Decimal order;
         public Boolean beforeInsert;
@@ -100,7 +81,6 @@ public class TriggerConfigService {
 
         public HandlerConfig(Trigger_Handler__mdt th) {
             className = th.Handler_Class__c.toLowerCase();
-            autoBind = th.Auto_Bind__c;
             enabled = th.Enabled__c;
             order = th.Execution_Order__c;
             beforeInsert = th.Before_Insert__c;

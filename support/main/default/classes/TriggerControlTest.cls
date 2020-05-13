@@ -5,7 +5,8 @@ private class TriggerControlTest {
         TriggerConfigService.ObjectConfig acct = generateObjTestData('account', true);
         TriggerConfigService.ObjectConfig cont = generateObjTestData('contact', true);
         acct = addChildHandlerToObj(acct, generateHandlerTestData('handler1', true));
-        acct = addChildHandlerToObj(acct, generateHandlerTestData('handler2', true));
+        // handler2 directly binds in trigger
+        // acct = addChildHandlerToObj(acct, generateHandlerTestData('handler2', true));
         cont = addChildHandlerToObj(cont, generateHandlerTestData('handler1', true));
         mdt.put('account', acct);
         mdt.put('contact', cont);
@@ -36,6 +37,7 @@ private class TriggerControlTest {
     @isTest
     private static void testAccountHandler2Disable() {
         Map<String, TriggerConfigService.ObjectConfig> mdt = buildMetadata();
+        addChildHandlerToObj(mdt.get('account'), generateHandlerTestData('handler2', true));
         mdt = disableHandler(mdt, 'account', 'handler2');
         TriggerConfigService.configMetadata = mdt;
         Boolean acctHandler1Fired = true;
@@ -85,7 +87,7 @@ private class TriggerControlTest {
         h3.className = 'handler3';
         h3.enabled = true;
         h3.order = 0;
-        h3.autoBind = true;
+        //h3.autoBind = true;
         h3.beforeInsert = true;
         h3.afterInsert = true;
         h3.beforeUpdate = true;
@@ -114,17 +116,11 @@ private class TriggerControlTest {
         System.assert(Handler3.events.size() == 7, 'All events should have fired one time');
     }
 
-    // not sure how to implement a test on legacy binding methods without putting legacy binding in the trigger
-
-    // @isTest
-    // private static void legacyBindingTest() {
-    // }
-
     @isTest
     private static void invalidHandlerTest() {
         Map<String, TriggerConfigService.ObjectConfig> mdt = buildMetadata();
         TriggerConfigService.ObjectConfig objConfig = mdt.get('contact');
-        objConfig.disabledHandlers.clear();
+        //objConfig.disabledHandlers.clear();
         objConfig.handlerOrder.clear();
         objConfig.handlers.clear();
         TriggerConfigService.HandlerConfig handlerConfig = generateHandlerTestData('badNameClass', true);
@@ -139,9 +135,26 @@ private class TriggerControlTest {
     }
 
     @isTest
+    private static void duplicateBindingTest() {
+        Map<String, TriggerConfigService.ObjectConfig> mdt = buildMetadata();
+        TriggerConfigService.ObjectConfig objConfig = mdt.get('contact');
+        TriggerConfigService.HandlerConfig handlerConfig = generateHandlerTestData('handler1', true);
+        addChildHandlerToObj(objConfig, handlerConfig);
+        mdt.put('contact', objConfig);
+        TriggerConfigService.configMetadata = mdt;
+        // class should only run once - currently just debugs
+        Boolean acctHandler1Fired = true;
+        Boolean acctHandler2Fired = true;
+        Boolean contactHandler1Fired = true;
+        runTest(acctHandler1Fired, acctHandler2Fired, contactHandler1Fired);
+        // handler 1 should run once for account and once for contact
+        system.assertEquals(2, Handler1.runCount, 'Handler should only run once per object');
+    }
+
+    @isTest
     private static void additionalCoverage() {
         Map<String, TriggerConfigService.ObjectConfig> forceGet = TriggerConfigService.configMetadata;
-        Trigger_Object__mdt objMdt = new Trigger_Object__mdt(Object__c = 'testerObj', Enabled__c = true);
+        Trigger_Object__mdt objMdt = new Trigger_Object__mdt(DeveloperName = 'testerObj', Enabled__c = true);
         TriggerConfigService.ObjectConfig objConstructorTest = new TriggerConfigService.ObjectConfig(objMdt);
         Trigger_Handler__mdt handlerMdt = new Trigger_Handler__mdt(Handler_Class__c = 'testerHandler');
         TriggerConfigService.HandlerConfig handlerConstructorTest = new TriggerConfigService.HandlerConfig(handlerMdt);
@@ -169,7 +182,7 @@ private class TriggerControlTest {
         TriggerConfigService.HandlerConfig handler = new TriggerConfigService.HandlerConfig();
         handler.className = className;
         handler.enabled = enabled;
-        handler.autoBind = true;
+        //handler.autoBind = true;
         handler.order = 0;
         handler.beforeInsert = true;
         handler.afterInsert = false;
@@ -190,9 +203,6 @@ private class TriggerControlTest {
         }
         obj.handlers.put(handler.className, handler);
         obj.handlerOrder.add(handler.className);
-        if (!handler.enabled) {
-            obj.disabledHandlers.add(handler.className);
-        }
         return obj;
     }
 
@@ -213,7 +223,6 @@ private class TriggerControlTest {
     ) {
         TriggerConfigService.ObjectConfig obj = mdt.get(objectName);
         obj.handlers.get(className).enabled = false;
-        obj.disabledHandlers.add(className);
         mdt.put(objectName, obj);
         return mdt;
     }
