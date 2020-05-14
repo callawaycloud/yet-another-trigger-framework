@@ -31,8 +31,12 @@ public class TriggerHandler {
     Map<System.TriggerOperation, List<HandlerInterface>> eventHandlerMapping = new Map<System.TriggerOperation, List<HandlerInterface>>();
 
     public TriggerHandler() {
-        System.debug(TriggerConfigService.configMetadata);
-        context = new TriggerContext();
+        this(new TriggerContext());
+    }
+
+    @testVisible
+    private TriggerHandler(TriggerContext context) {
+        this.context = context;
         triggerConfig = TriggerConfigService.configMetadata.get(sObjectType);
         System.debug(context);
         System.debug(triggerConfig);
@@ -45,28 +49,28 @@ public class TriggerHandler {
      */
     public TriggerHandler bind(Evt event, HandlerInterface eh) {
         System.TriggerOperation mappedEvent;
-        switch on event{
-          when beforeInsert {
-            mappedEvent = System.TriggerOperation.BEFORE_INSERT;
-          }
-          when afterInsert {
-            mappedEvent = System.TriggerOperation.AFTER_INSERT;
-          }
-          when beforeUpdate {
-            mappedEvent = System.TriggerOperation.BEFORE_UPDATE;
-          }
-          when afterUpdate {
-            mappedEvent = System.TriggerOperation.AFTER_UPDATE;
-          }
-          when beforeDelete {
-            mappedEvent = System.TriggerOperation.BEFORE_DELETE;
-          }
-          when afterDelete {
-            mappedEvent = System.TriggerOperation.AFTER_DELETE;
-          }
-          when afterUndelete {
-            mappedEvent = System.TriggerOperation.AFTER_UNDELETE;
-          }
+        switch on event {
+            when beforeInsert {
+                mappedEvent = System.TriggerOperation.BEFORE_INSERT;
+            }
+            when afterInsert {
+                mappedEvent = System.TriggerOperation.AFTER_INSERT;
+            }
+            when beforeUpdate {
+                mappedEvent = System.TriggerOperation.BEFORE_UPDATE;
+            }
+            when afterUpdate {
+                mappedEvent = System.TriggerOperation.AFTER_UPDATE;
+            }
+            when beforeDelete {
+                mappedEvent = System.TriggerOperation.BEFORE_DELETE;
+            }
+            when afterDelete {
+                mappedEvent = System.TriggerOperation.AFTER_DELETE;
+            }
+            when afterUndelete {
+                mappedEvent = System.TriggerOperation.AFTER_UNDELETE;
+            }
         }
         return bind(mappedEvent, eh);
     }
@@ -86,7 +90,7 @@ public class TriggerHandler {
      */
     public void manage() {
         system.debug(triggerConfig);
-        if (triggerConfig != null && !triggerConfig.enabled){
+        if (triggerConfig != null && !triggerConfig.enabled) {
             return;
         }
 
@@ -98,10 +102,9 @@ public class TriggerHandler {
             Set<String> firedHandlers = new Set<String>{};
             for (HandlerInterface h : handlers) {
                 if (!handlerDisabled(h)) {
-
                     // potentially move this to binding
-                    if(h instanceOf BaseTriggerHandler){
-                      ((BaseTriggerHandler) h).context = this.context;
+                    if (h instanceof BaseTriggerHandler) {
+                        ((BaseTriggerHandler) h).context = this.context;
                     }
 
                     String handlerName = getHandlerName(h);
