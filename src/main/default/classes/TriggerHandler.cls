@@ -16,6 +16,9 @@ public class TriggerHandler {
     @testVisible
     private TriggerConfigService.ObjectConfig triggerConfig;
 
+    @testVisible
+    private TriggerContext context;
+
     /*
      *   Simplistic handler to implement on any of the event. It doesn't require or enforces any pattern except the
      *   method name to be "handle()".
@@ -30,6 +33,7 @@ public class TriggerHandler {
     public TriggerHandler() {
         System.debug(TriggerConfigService.configMetadata);
         triggerConfig = TriggerConfigService.configMetadata.get(sObjectType);
+        context = new TriggerContext();
         System.debug(triggerConfig);
         doAutomaticBinding();
     }
@@ -79,6 +83,9 @@ public class TriggerHandler {
             Set<String> firedHandlers = new Set<String>{};
             for (HandlerInterface h : handlers) {
                 if (!handlerDisabled(h)) {
+                    if(h instanceOf BaseTriggerHandler){
+                      ((BaseTriggerHandler) h).context = this.context;
+                    }
                     String handlerName = getHandlerName(h);
                     if (firedHandlers.contains(handlerName)) {
                         System.debug('Duplicate binding for handler: ' + handlerName);
