@@ -7,6 +7,14 @@ public class TriggerContext {
   public Map<Id, SObject> newRecordMap;
   public SObject[] oldRecords;
   public Map<Id, SObject> oldRecordMap;
+
+  public Boolean isInsert = false;
+  public Boolean isUpdate = false;
+  public Boolean isDelete = false;
+  public Boolean isBefore = false;
+  public Boolean isAfter = false;
+  public Boolean isUndelete = false;
+
   public TriggerContext() {
       if (Trigger.isExecuting) {
           isExecuting = Trigger.isExecuting;
@@ -16,6 +24,12 @@ public class TriggerContext {
           newRecordMap = Trigger.newMap;
           oldRecords = Trigger.old;
           oldRecordMap = Trigger.oldMap;
+          isInsert = Trigger.isInsert;
+          isUpdate = Trigger.isUpdate;
+          isDelete = Trigger.isDelete;
+          isBefore = Trigger.isBefore;
+          isAfter = Trigger.isAfter;
+          isUndelete = Trigger.isUndelete;
       }
   }
 
@@ -37,5 +51,36 @@ public class TriggerContext {
       this.oldRecordMap = new Map<Id, SObject>(oldRecords);
     }
     size = newRecords != null ? newRecords.size() : oldRecords.size();
+
+    switch on operationType{
+      when BEFORE_INSERT {
+        isBefore = true;
+        isInsert = true;
+      }
+      when AFTER_INSERT {
+        isAfter = true;
+        isInsert = true;
+      }
+      when BEFORE_UPDATE {
+        isBefore = true;
+        isUpdate = true;
+      }
+      when AFTER_UPDATE {
+        isAfter = true;
+        isUpdate = true;
+      }
+      when BEFORE_DELETE {
+        isBefore = true;
+        isDelete = true;
+      }
+      when AFTER_DELETE {
+        isAfter = true;
+        isDelete = true;
+      }
+      when AFTER_UNDELETE {
+        isAfter = true;
+        isUndelete = true;
+      }
+    }
   }
 }

@@ -28,24 +28,54 @@ public class TriggerHandler {
     }
 
     // Internal mapping of handlers
-    Map<String, List<HandlerInterface>> eventHandlerMapping = new Map<String, List<HandlerInterface>>();
+    Map<System.TriggerOperation, List<HandlerInterface>> eventHandlerMapping = new Map<System.TriggerOperation, List<HandlerInterface>>();
 
     public TriggerHandler() {
         System.debug(TriggerConfigService.configMetadata);
-        triggerConfig = TriggerConfigService.configMetadata.get(sObjectType);
         context = new TriggerContext();
+        triggerConfig = TriggerConfigService.configMetadata.get(sObjectType);
+        System.debug(context);
         System.debug(triggerConfig);
         doAutomaticBinding();
     }
 
     /**
      *   Core API to bind handlers with events
+     *   @depreciated use bind(System.TriggerOperation event, HandlerInterface eh)
      */
     public TriggerHandler bind(Evt event, HandlerInterface eh) {
-        List<HandlerInterface> handlers = eventHandlerMapping.get(event.name());
+        System.TriggerOperation mappedEvent;
+        switch on event{
+          when beforeInsert {
+            mappedEvent = System.TriggerOperation.BEFORE_INSERT;
+          }
+          when afterInsert {
+            mappedEvent = System.TriggerOperation.AFTER_INSERT;
+          }
+          when beforeUpdate {
+            mappedEvent = System.TriggerOperation.BEFORE_UPDATE;
+          }
+          when afterUpdate {
+            mappedEvent = System.TriggerOperation.AFTER_UPDATE;
+          }
+          when beforeDelete {
+            mappedEvent = System.TriggerOperation.BEFORE_DELETE;
+          }
+          when afterDelete {
+            mappedEvent = System.TriggerOperation.AFTER_DELETE;
+          }
+          when afterUndelete {
+            mappedEvent = System.TriggerOperation.AFTER_UNDELETE;
+          }
+        }
+        return bind(mappedEvent, eh);
+    }
+
+    public TriggerHandler bind(System.TriggerOperation event, HandlerInterface eh) {
+        List<HandlerInterface> handlers = eventHandlerMapping.get(event);
         if (handlers == null) {
             handlers = new List<HandlerInterface>();
-            eventHandlerMapping.put(event.name(), handlers);
+            eventHandlerMapping.put(event, handlers);
         }
         handlers.add(eh);
         return this;
@@ -56,27 +86,12 @@ public class TriggerHandler {
      */
     public void manage() {
         system.debug(triggerConfig);
-        if (triggerConfig != null && !triggerConfig.enabled)
+        if (triggerConfig != null && !triggerConfig.enabled){
             return;
-
-        Evt ev = null;
-        if (Trigger.isInsert && Trigger.isBefore) {
-            ev = Evt.beforeInsert;
-        } else if (Trigger.isInsert && Trigger.isAfter) {
-            ev = Evt.afterInsert;
-        } else if (Trigger.isUpdate && Trigger.isBefore) {
-            ev = Evt.beforeUpdate;
-        } else if (Trigger.isUpdate && Trigger.isAfter) {
-            ev = Evt.afterUpdate;
-        } else if (Trigger.isDelete && Trigger.isBefore) {
-            ev = Evt.beforeDelete;
-        } else if (Trigger.isDelete && Trigger.isAfter) {
-            ev = Evt.afterDelete;
-        } else if (Trigger.isUndelete) {
-            ev = Evt.afterUndelete;
         }
+
         system.debug(eventHandlerMapping);
-        List<HandlerInterface> handlers = eventHandlerMapping.get(ev.name());
+        List<HandlerInterface> handlers = eventHandlerMapping.get(context.operationType);
 
         if (handlers != null && !handlers.isEmpty()) {
             // prevent duplicate runs within an event
@@ -125,6 +140,7 @@ public class TriggerHandler {
                 );
                 continue;
             }
+
             if (handlerConfig.beforeInsert) {
                 bind(Evt.beforeInsert, handlerClass);
             }
@@ -167,10 +183,10 @@ public class TriggerHandler {
     private String sObjectType {
         get {
             if (sObjectType == null) {
-                if (Trigger.isDelete) {
-                    sObjectType = getSObjectType(Trigger.old[0]);
+                if (this.context.isDelete) {
+                    sObjectType = getSObjectType(this.context.oldRecords[0]);
                 } else {
-                    sObjectType = getSObjectType(Trigger.new[0]);
+                    sObjectType = getSObjectType(this.context.newRecords[0]);
                 }
             }
             return sObjectType.toLowerCase();
