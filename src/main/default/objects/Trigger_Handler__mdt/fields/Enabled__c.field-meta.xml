@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Enabled__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>If unchecked, this specific handler will be prevented from running. This also applies to legacy handler binding directly in master trigger.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>If unchecked, this specific handler will be prevented from running. This also applies to legacy handler binding directly in master trigger.</inlineHelpText>
+    <label>Enabled</label>
+    <type>Checkbox</type>
+</CustomField>

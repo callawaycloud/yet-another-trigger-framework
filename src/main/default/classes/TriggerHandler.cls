@@ -13,6 +13,9 @@ public class TriggerHandler {
         beforeUpdate
     }
 
+    @testVisible
+    private TriggerConfigService.ObjectConfig triggerConfig;
+
     /*
      *   Simplistic handler to implement on any of the event. It doesn't require or enforces any pattern except the
      *   method name to be "handle()".
@@ -23,6 +26,13 @@ public class TriggerHandler {
 
     // Internal mapping of handlers
     Map<String, List<HandlerInterface>> eventHandlerMapping = new Map<String, List<HandlerInterface>>();
+
+    public TriggerHandler() {
+        System.debug(TriggerConfigService.configMetadata);
+        triggerConfig = TriggerConfigService.configMetadata.get(sObjectType);
+        System.debug(triggerConfig);
+        doAutomaticBinding();
+    }
 
     /**
      *   Core API to bind handlers with events
@@ -41,7 +51,8 @@ public class TriggerHandler {
      *   Invokes correct handlers as per the context of Trigger and available registered handlers
      */
     public void manage() {
-        if (objectDisabled(sObjectType))
+        system.debug(triggerConfig);
+        if (triggerConfig != null && !triggerConfig.enabled)
             return;
 
         Evt ev = null;
@@ -60,56 +71,90 @@ public class TriggerHandler {
         } else if (Trigger.isUndelete) {
             ev = Evt.afterUndelete;
         }
-
+        system.debug(eventHandlerMapping);
         List<HandlerInterface> handlers = eventHandlerMapping.get(ev.name());
 
         if (handlers != null && !handlers.isEmpty()) {
+            // prevent duplicate runs within an event
+            Set<String> firedHandlers = new Set<String>{};
             for (HandlerInterface h : handlers) {
-                if (!handlerDisabled(h) && !objectHandlerDisabled(sObjectType, h)) {
-                    h.handle();
+                if (!handlerDisabled(h)) {
+                    String handlerName = getHandlerName(h);
+                    if (firedHandlers.contains(handlerName)) {
+                        System.debug('Duplicate binding for handler: ' + handlerName);
+                        continue;
+                    } else {
+                        h.handle();
+                        firedHandlers.add(handlerName);
+                    }
                 }
             }
         }
     }
 
-    private static Set<String> disabledObjects = new Set<String>();
-    private static Set<String> disabledHandlers = new Set<String>();
-    private static Map<String, Set<String>> disabledObjectHandlers = new Map<String, Set<String>>();
-    @TestVisible
-    private static void cacheTriggerControl(Trigger_Control__mdt[] triggerControls) {
-        disabledObjects.clear();
-        disabledHandlers.clear();
-        disabledObjectHandlers.clear();
-        for (Trigger_Control__mdt triggerControl : triggerControls) {
-            String objectName = triggerControl.Object__c == null ? null : triggerControl.Object__c.toLowerCase();
-            String handlerName = triggerControl.Class__c == null ? null : triggerControl.Class__c.toLowerCase();
-            if (handlerName == null && objectName != null) {
-                disabledObjects.add(objectName);
-            } else if (handlerName != null && objectName == null) {
-                disabledHandlers.add(handlerName);
-            } else if (handlerName != null && objectName != null) {
-                if (!disabledObjectHandlers.containsKey(objectName)) {
-                    disabledObjectHandlers.put(objectName, new Set<String>());
-                }
-                disabledObjectHandlers.get(objectName).add(handlerName);
+    private void doAutomaticBinding() {
+        if (triggerConfig == null || !triggerConfig.enabled) {
+            return;
+        }
+        for (String handlerName : triggerConfig.handlerOrder) {
+            TriggerConfigService.HandlerConfig handlerConfig = triggerConfig.handlers.get(handlerName);
+            // do not bind if auto bind is off or if handler is disabled
+            if (!handlerConfig.enabled) {
+                continue;
+            }
+            Type t = getType(handlerConfig.className);
+            if (t == null) {
+                System.debug('Class does not exist: ' + handlerConfig.className);
+                continue;
+            }
+            HandlerInterface handlerClass;
+            try {
+                handlerClass = (HandlerInterface) t.newInstance();
+            } catch (TypeException te) {
+                System.debug(
+                    'Cannot bind invalid class ' +
+                    handlerConfig.className +
+                    '. Make sure your handler implements the HandlerInterface'
+                );
+                continue;
+            }
+            if (handlerConfig.beforeInsert) {
+                bind(Evt.beforeInsert, handlerClass);
+            }
+            if (handlerConfig.afterInsert) {
+                bind(Evt.afterInsert, handlerClass);
+            }
+            if (handlerConfig.beforeUpdate) {
+                bind(Evt.beforeUpdate, handlerClass);
+            }
+            if (handlerConfig.afterUpdate) {
+                bind(Evt.afterUpdate, handlerClass);
+            }
+            if (handlerConfig.beforeDelete) {
+                bind(Evt.beforeDelete, handlerClass);
+            }
+            if (handlerConfig.afterDelete) {
+                bind(Evt.afterDelete, handlerClass);
+            }
+            if (handlerConfig.afterUndelete) {
+                bind(Evt.afterUndelete, handlerClass);
             }
         }
     }
-    static {
-        cacheTriggerControl([SELECT Class__c, Object__c FROM Trigger_Control__mdt]);
-    }
 
-    private Boolean objectDisabled(String xSObjType) {
-        return disabledObjects.contains(xSObjType);
+    private Type getType(String className) {
+        Type t;
+        t = Type.forName(className); // doesn't throw exception if invalid name!
+        return t;
     }
 
     private Boolean handlerDisabled(HandlerInterface h) {
-        return disabledHandlers.contains(getHandlerName(h));
-    }
-
-    private Boolean objectHandlerDisabled(String xSObjectType, HandlerInterface h) {
-        return disabledObjectHandlers.containsKey(xSObjectType) &&
-            disabledObjectHandlers.get(xSObjectType).contains(getHandlerName(h));
+        if (triggerConfig == null) {
+            return false;
+        }
+        TriggerConfigService.HandlerConfig hc = triggerConfig.handlers.get((getHandlerName(h)));
+        boolean disabled = hc != null && !hc.enabled;
+        return disabled;
     }
 
     private String sObjectType {
@@ -121,7 +166,7 @@ public class TriggerHandler {
                     sObjectType = getSObjectType(Trigger.new[0]);
                 }
             }
-            return sObjectType;
+            return sObjectType.toLowerCase();
         }
         set;
     }
