@@ -98,9 +98,12 @@ public class TriggerHandler {
             Set<String> firedHandlers = new Set<String>{};
             for (HandlerInterface h : handlers) {
                 if (!handlerDisabled(h)) {
+
+                    // potentially move this to binding
                     if(h instanceOf BaseTriggerHandler){
                       ((BaseTriggerHandler) h).context = this.context;
                     }
+
                     String handlerName = getHandlerName(h);
                     if (firedHandlers.contains(handlerName)) {
                         System.debug('Duplicate binding for handler: ' + handlerName);
