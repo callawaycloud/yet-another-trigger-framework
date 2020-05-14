@@ -1,18 +1,5 @@
 // Based on https://github.com/joeferraro/MavensMate-Templates/blob/master/ApexClass/TriggerHandler.cls
 public class TriggerHandler {
-    /**
-     *   Enum representing each of before/after CRUD events on Sobjects
-     */
-    public enum Evt {
-        afterDelete,
-        afterInsert,
-        afterUndelete,
-        afterUpdate,
-        beforeDelete,
-        beforeInsert,
-        beforeUpdate
-    }
-
     @testVisible
     private TriggerConfigService.ObjectConfig triggerConfig;
 
@@ -41,38 +28,6 @@ public class TriggerHandler {
         System.debug(context);
         System.debug(triggerConfig);
         doAutomaticBinding();
-    }
-
-    /**
-     *   Core API to bind handlers with events
-     *   @depreciated use bind(System.TriggerOperation event, HandlerInterface eh)
-     */
-    public TriggerHandler bind(Evt event, HandlerInterface eh) {
-        System.TriggerOperation mappedEvent;
-        switch on event {
-            when beforeInsert {
-                mappedEvent = System.TriggerOperation.BEFORE_INSERT;
-            }
-            when afterInsert {
-                mappedEvent = System.TriggerOperation.AFTER_INSERT;
-            }
-            when beforeUpdate {
-                mappedEvent = System.TriggerOperation.BEFORE_UPDATE;
-            }
-            when afterUpdate {
-                mappedEvent = System.TriggerOperation.AFTER_UPDATE;
-            }
-            when beforeDelete {
-                mappedEvent = System.TriggerOperation.BEFORE_DELETE;
-            }
-            when afterDelete {
-                mappedEvent = System.TriggerOperation.AFTER_DELETE;
-            }
-            when afterUndelete {
-                mappedEvent = System.TriggerOperation.AFTER_UNDELETE;
-            }
-        }
-        return bind(mappedEvent, eh);
     }
 
     public TriggerHandler bind(System.TriggerOperation event, HandlerInterface eh) {
@@ -207,5 +162,51 @@ public class TriggerHandler {
 
     private String getSObjectType(SObject sObj) {
         return String.valueOf(sObj.getSObjectType()).toLowerCase();
+    }
+
+    /**
+     *   Enum representing each of before/after CRUD events on Sobjects
+     *   @depreciated  Use System.TriggerOperation
+     */
+    public enum Evt {
+        afterDelete,
+        afterInsert,
+        afterUndelete,
+        afterUpdate,
+        beforeDelete,
+        beforeInsert,
+        beforeUpdate
+    }
+
+    /**
+     *   Core API to bind handlers with events
+     *   @depreciated use bind(System.TriggerOperation event, HandlerInterface eh)
+     */
+    public TriggerHandler bind(Evt event, HandlerInterface eh) {
+        System.TriggerOperation mappedEvent;
+        switch on event {
+            when beforeInsert {
+                mappedEvent = System.TriggerOperation.BEFORE_INSERT;
+            }
+            when afterInsert {
+                mappedEvent = System.TriggerOperation.AFTER_INSERT;
+            }
+            when beforeUpdate {
+                mappedEvent = System.TriggerOperation.BEFORE_UPDATE;
+            }
+            when afterUpdate {
+                mappedEvent = System.TriggerOperation.AFTER_UPDATE;
+            }
+            when beforeDelete {
+                mappedEvent = System.TriggerOperation.BEFORE_DELETE;
+            }
+            when afterDelete {
+                mappedEvent = System.TriggerOperation.AFTER_DELETE;
+            }
+            when afterUndelete {
+                mappedEvent = System.TriggerOperation.AFTER_UNDELETE;
+            }
+        }
+        return bind(mappedEvent, eh);
     }
 }
