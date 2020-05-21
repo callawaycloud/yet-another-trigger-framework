@@ -15,7 +15,10 @@ public class TriggerHandler {
     }
 
     // Internal mapping of handlers
-    Map<System.TriggerOperation, List<HandlerInterface>> eventHandlerMapping = new Map<System.TriggerOperation, List<HandlerInterface>>();
+    @testVisible
+    private Map<System.TriggerOperation, List<HandlerInterface>> eventHandlerMapping = new Map<System.TriggerOperation, List<HandlerInterface>>();
+    @testVisible
+    private Map<System.TriggerOperation, Set<String>> eventHandlerNamesMap = new Map<System.TriggerOperation, Set<String>>();
 
     public TriggerHandler() {
         this(new TriggerContext());
@@ -25,18 +28,31 @@ public class TriggerHandler {
     private TriggerHandler(TriggerContext context) {
         this.context = context;
         triggerConfig = TriggerConfigService.configMetadata.get(sObjectType);
-        System.debug(context);
-        System.debug(triggerConfig);
         doAutomaticBinding();
     }
 
     public TriggerHandler bind(System.TriggerOperation event, HandlerInterface eh) {
         List<HandlerInterface> handlers = eventHandlerMapping.get(event);
+        Set<String> handlerNames = eventHandlerNamesMap.get(event);
+        String hName = getHandlerName(eh);
+
+        if (handlerNames == null) {
+            handlerNames = new Set<String>();
+            eventHandlerNamesMap.put(event, handlerNames);
+        }
         if (handlers == null) {
             handlers = new List<HandlerInterface>();
             eventHandlerMapping.put(event, handlers);
         }
-        handlers.add(eh);
+
+        if (handlerDisabled(eh)) {
+            System.debug('Handler is disabled: ' + hName);
+        } else if (handlerNames.contains(hName)) {
+            System.debug('Already bound handler: ' + hName);
+        } else {
+            handlerNames.add(hName);
+            handlers.add(eh);
+        }
         return this;
     }
 
@@ -44,32 +60,25 @@ public class TriggerHandler {
      *   Invokes correct handlers as per the context of Trigger and available registered handlers
      */
     public void manage() {
-        system.debug(triggerConfig);
         if (triggerConfig != null && !triggerConfig.enabled) {
             return;
         }
 
-        system.debug(eventHandlerMapping);
         List<HandlerInterface> handlers = eventHandlerMapping.get(context.operationType);
 
         if (handlers != null && !handlers.isEmpty()) {
-            // prevent duplicate runs within an event
-            Set<String> firedHandlers = new Set<String>{};
             for (HandlerInterface h : handlers) {
-                if (!handlerDisabled(h)) {
-                    // potentially move this to binding
-                    if (h instanceof BaseTriggerHandler) {
-                        ((BaseTriggerHandler) h).context = this.context;
-                    }
-
-                    String handlerName = getHandlerName(h);
-                    if (firedHandlers.contains(handlerName)) {
-                        System.debug('Duplicate binding for handler: ' + handlerName);
-                        continue;
-                    } else {
+                if (h instanceof BaseTriggerHandler) {
+                    ((BaseTriggerHandler) h).context = this.context;
+                }
+                if (isDebugOnly(h)) {
+                    try {
                         h.handle();
-                        firedHandlers.add(handlerName);
+                    } catch (Exception e) {
+                        System.debug(JSON.serializePretty(e));
                     }
+                } else {
+                    h.handle();
                 }
             }
         }
@@ -139,6 +148,16 @@ public class TriggerHandler {
         TriggerConfigService.HandlerConfig hc = triggerConfig.handlers.get((getHandlerName(h)));
         boolean disabled = hc != null && !hc.enabled;
         return disabled;
+    }
+
+    private Boolean isDebugOnly(HandlerInterface h) {
+        if (triggerConfig == null) {
+            return false;
+        }
+        TriggerConfigService.HandlerConfig hc = triggerConfig.handlers.get((getHandlerName(h)));
+        system.debug(JSON.serializePretty(hc));
+        boolean debugErrors = hc != null && hc.debugErrors;
+        return debugErrors;
     }
 
     private String sObjectType {

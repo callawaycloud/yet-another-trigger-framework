@@ -26,7 +26,8 @@ public class TriggerConfigService {
                         After_Delete__c,
                         After_Undelete__c,
                         Before_Update__c,
-                        After_Update__c
+                        After_Update__c,
+                        Debug_Errors__c
                     FROM Trigger_Handlers__r
                     ORDER BY Execution_Order__c ASC
                 )
@@ -75,6 +76,7 @@ public class TriggerConfigService {
         public Boolean beforeDelete;
         public Boolean afterDelete;
         public Boolean afterUndelete;
+        public Boolean debugErrors;
 
         public HandlerConfig() {
         }
@@ -90,6 +92,7 @@ public class TriggerConfigService {
             beforeDelete = th.Before_Delete__c;
             afterDelete = th.After_Delete__c;
             afterUndelete = th.After_Undelete__c;
+            debugErrors = th.Debug_Errors__c;
         }
     }
 }
