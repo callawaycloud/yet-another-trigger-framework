@@ -1,24 +1,24 @@
 // https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_triggers_context_variables.htm
-public class TriggerContext {
-    public boolean isExecuting;
-    public System.TriggerOperation operationType;
-    public Integer size;
-    public SObject[] newRecords;
-    public Map<Id, SObject> newRecordMap;
-    public SObject[] oldRecords;
-    public Map<Id, SObject> oldRecordMap;
+global class TriggerContext {
+    global boolean isExecuting;
+    global System.TriggerOperation operationType;
+    global Integer size;
+    global SObject[] newRecords;
+    global Map<Id, SObject> newRecordMap;
+    global SObject[] oldRecords;
+    global Map<Id, SObject> oldRecordMap;
 
-    public Boolean isInsert = false;
-    public Boolean isUpdate = false;
-    public Boolean isDelete = false;
-    public Boolean isBefore = false;
-    public Boolean isAfter = false;
-    public Boolean isUndelete = false;
+    global Boolean isInsert = false;
+    global Boolean isUpdate = false;
+    global Boolean isDelete = false;
+    global Boolean isBefore = false;
+    global Boolean isAfter = false;
+    global Boolean isUndelete = false;
 
     @TestVisible
     private static boolean triggerCoverage = false;
 
-    public TriggerContext() {
+    global TriggerContext() {
         if (Trigger.isExecuting || triggerCoverage) {
             isExecuting = !triggerCoverage ? Trigger.isExecuting : false;
             operationType = !triggerCoverage ? Trigger.operationType : null;

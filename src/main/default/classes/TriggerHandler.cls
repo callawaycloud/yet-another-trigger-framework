@@ -1,5 +1,5 @@
 // Based on https://github.com/joeferraro/MavensMate-Templates/blob/master/ApexClass/TriggerHandler.cls
-public class TriggerHandler {
+global class TriggerHandler {
     @testVisible
     private TriggerConfigService.ObjectConfig triggerConfig;
 
@@ -10,7 +10,7 @@ public class TriggerHandler {
      *   Simplistic handler to implement on any of the event. It doesn't require or enforces any pattern except the
      *   method name to be "handle()".
      */
-    public interface HandlerInterface {
+    global interface HandlerInterface {
         void handle();
     }
 
@@ -20,7 +20,7 @@ public class TriggerHandler {
     @testVisible
     private Map<System.TriggerOperation, Set<String>> eventHandlerNamesMap = new Map<System.TriggerOperation, Set<String>>();
 
-    public TriggerHandler() {
+    global TriggerHandler() {
         this(new TriggerContext());
     }
 
@@ -31,7 +31,7 @@ public class TriggerHandler {
         doAutomaticBinding();
     }
 
-    public TriggerHandler bind(System.TriggerOperation event, HandlerInterface eh) {
+    global TriggerHandler bind(System.TriggerOperation event, HandlerInterface eh) {
         List<HandlerInterface> handlers = eventHandlerMapping.get(event);
         Set<String> handlerNames = eventHandlerNamesMap.get(event);
         String hName = getHandlerName(eh);
@@ -59,7 +59,7 @@ public class TriggerHandler {
     /**
      *   Invokes correct handlers as per the context of Trigger and available registered handlers
      */
-    public void manage() {
+    global void manage() {
         if (triggerConfig != null && !triggerConfig.enabled) {
             return;
         }
@@ -187,7 +187,7 @@ public class TriggerHandler {
      *   Enum representing each of before/after CRUD events on Sobjects
      *   @depreciated  Use System.TriggerOperation
      */
-    public enum Evt {
+    global enum Evt {
         afterDelete,
         afterInsert,
         afterUndelete,
@@ -201,7 +201,7 @@ public class TriggerHandler {
      *   Core API to bind handlers with events
      *   @depreciated use bind(System.TriggerOperation event, HandlerInterface eh)
      */
-    public TriggerHandler bind(Evt event, HandlerInterface eh) {
+    global TriggerHandler bind(Evt event, HandlerInterface eh) {
         System.TriggerOperation mappedEvent;
         switch on event {
             when beforeInsert {
