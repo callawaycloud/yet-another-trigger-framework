@@ -12,8 +12,8 @@
     "sfdcLoginUrl": "https://login.salesforce.com",
     "sourceApiVersion": "48.0",
     "packageAliases": {
-        "CCC Trigger Handler": "0Ho1C000000002RSAQ",
-        "CCC Trigger Handler@0.1.0-1": "04t1C000000goLRQAY",
-        "CCC Trigger Handler@0.1.0-2": "04t1C000000goLlQAI"
+        "CCC Trigger Handler": "0Ho1C000000TN1PSAW",
+        "CCC Trigger Handler@0.1.0-1": "04t1C000000pQasQAE",
+        "CCC Trigger Handler@0.1.0-2": "04t1C000000pQb2QAE"
     }
 }
