@@ -1,92 +1,84 @@
 // Based on https://github.com/joeferraro/MavensMate-Templates/blob/master/ApexClass/TriggerHandler.cls
-public class TriggerHandler {
-    /**
-     *   Enum representing each of before/after CRUD events on Sobjects
-     */
-    public enum Evt {
-        afterDelete,
-        afterInsert,
-        afterUndelete,
-        afterUpdate,
-        beforeDelete,
-        beforeInsert,
-        beforeUpdate
-    }
-
+global class TriggerHandler {
     @testVisible
     private TriggerConfigService.ObjectConfig triggerConfig;
+
+    @testVisible
+    private TriggerContext context;
 
     /*
      *   Simplistic handler to implement on any of the event. It doesn't require or enforces any pattern except the
      *   method name to be "handle()".
      */
-    public interface HandlerInterface {
+    global interface HandlerInterface {
         void handle();
     }
 
     // Internal mapping of handlers
-    Map<String, List<HandlerInterface>> eventHandlerMapping = new Map<String, List<HandlerInterface>>();
+    @testVisible
+    private Map<System.TriggerOperation, List<HandlerInterface>> eventHandlerMapping = new Map<System.TriggerOperation, List<HandlerInterface>>();
+    @testVisible
+    private Map<System.TriggerOperation, Set<String>> eventHandlerNamesMap = new Map<System.TriggerOperation, Set<String>>();
 
-    public TriggerHandler() {
-        System.debug(TriggerConfigService.configMetadata);
+    global TriggerHandler() {
+        this(new TriggerContext());
+    }
+
+    @testVisible
+    private TriggerHandler(TriggerContext context) {
+        this.context = context;
         triggerConfig = TriggerConfigService.configMetadata.get(sObjectType);
-        System.debug(triggerConfig);
         doAutomaticBinding();
     }
 
-    /**
-     *   Core API to bind handlers with events
-     */
-    public TriggerHandler bind(Evt event, HandlerInterface eh) {
-        List<HandlerInterface> handlers = eventHandlerMapping.get(event.name());
+    global TriggerHandler bind(System.TriggerOperation event, HandlerInterface eh) {
+        List<HandlerInterface> handlers = eventHandlerMapping.get(event);
+        Set<String> handlerNames = eventHandlerNamesMap.get(event);
+        String hName = getHandlerName(eh);
+
+        if (handlerNames == null) {
+            handlerNames = new Set<String>();
+            eventHandlerNamesMap.put(event, handlerNames);
+        }
         if (handlers == null) {
             handlers = new List<HandlerInterface>();
-            eventHandlerMapping.put(event.name(), handlers);
+            eventHandlerMapping.put(event, handlers);
         }
-        handlers.add(eh);
+
+        if (handlerDisabled(eh)) {
+            System.debug('Handler is disabled: ' + hName);
+        } else if (handlerNames.contains(hName)) {
+            System.debug('Already bound handler: ' + hName);
+        } else {
+            handlerNames.add(hName);
+            handlers.add(eh);
+        }
         return this;
     }
 
     /**
      *   Invokes correct handlers as per the context of Trigger and available registered handlers
      */
-    public void manage() {
-        system.debug(triggerConfig);
-        if (triggerConfig != null && !triggerConfig.enabled)
+    global void manage() {
+        if (triggerConfig != null && !triggerConfig.enabled) {
             return;
-
-        Evt ev = null;
-        if (Trigger.isInsert && Trigger.isBefore) {
-            ev = Evt.beforeInsert;
-        } else if (Trigger.isInsert && Trigger.isAfter) {
-            ev = Evt.afterInsert;
-        } else if (Trigger.isUpdate && Trigger.isBefore) {
-            ev = Evt.beforeUpdate;
-        } else if (Trigger.isUpdate && Trigger.isAfter) {
-            ev = Evt.afterUpdate;
-        } else if (Trigger.isDelete && Trigger.isBefore) {
-            ev = Evt.beforeDelete;
-        } else if (Trigger.isDelete && Trigger.isAfter) {
-            ev = Evt.afterDelete;
-        } else if (Trigger.isUndelete) {
-            ev = Evt.afterUndelete;
         }
-        system.debug(eventHandlerMapping);
-        List<HandlerInterface> handlers = eventHandlerMapping.get(ev.name());
+
+        List<HandlerInterface> handlers = eventHandlerMapping.get(context.operationType);
 
         if (handlers != null && !handlers.isEmpty()) {
-            // prevent duplicate runs within an event
-            Set<String> firedHandlers = new Set<String>{};
             for (HandlerInterface h : handlers) {
-                if (!handlerDisabled(h)) {
-                    String handlerName = getHandlerName(h);
-                    if (firedHandlers.contains(handlerName)) {
-                        System.debug('Duplicate binding for handler: ' + handlerName);
-                        continue;
-                    } else {
+                if (h instanceof BaseTriggerHandler) {
+                    ((BaseTriggerHandler) h).context = this.context;
+                }
+                if (isDebugOnly(h)) {
+                    try {
                         h.handle();
-                        firedHandlers.add(handlerName);
+                    } catch (Exception e) {
+                        System.debug(JSON.serializePretty(e));
                     }
+                } else {
+                    h.handle();
                 }
             }
         }
@@ -118,6 +110,7 @@ public class TriggerHandler {
                 );
                 continue;
             }
+
             if (handlerConfig.beforeInsert) {
                 bind(Evt.beforeInsert, handlerClass);
             }
@@ -157,13 +150,23 @@ public class TriggerHandler {
         return disabled;
     }
 
+    private Boolean isDebugOnly(HandlerInterface h) {
+        if (triggerConfig == null) {
+            return false;
+        }
+        TriggerConfigService.HandlerConfig hc = triggerConfig.handlers.get((getHandlerName(h)));
+        system.debug(JSON.serializePretty(hc));
+        boolean debugErrors = hc != null && hc.debugErrors;
+        return debugErrors;
+    }
+
     private String sObjectType {
         get {
             if (sObjectType == null) {
-                if (Trigger.isDelete) {
-                    sObjectType = getSObjectType(Trigger.old[0]);
+                if (this.context.isDelete) {
+                    sObjectType = getSObjectType(this.context.oldRecords[0]);
                 } else {
-                    sObjectType = getSObjectType(Trigger.new[0]);
+                    sObjectType = getSObjectType(this.context.newRecords[0]);
                 }
             }
             return sObjectType.toLowerCase();
@@ -178,5 +181,51 @@ public class TriggerHandler {
 
     private String getSObjectType(SObject sObj) {
         return String.valueOf(sObj.getSObjectType()).toLowerCase();
+    }
+
+    /**
+     *   Enum representing each of before/after CRUD events on Sobjects
+     *   @depreciated  Use System.TriggerOperation
+     */
+    global enum Evt {
+        afterDelete,
+        afterInsert,
+        afterUndelete,
+        afterUpdate,
+        beforeDelete,
+        beforeInsert,
+        beforeUpdate
+    }
+
+    /**
+     *   Core API to bind handlers with events
+     *   @depreciated use bind(System.TriggerOperation event, HandlerInterface eh)
+     */
+    global TriggerHandler bind(Evt event, HandlerInterface eh) {
+        System.TriggerOperation mappedEvent;
+        switch on event {
+            when beforeInsert {
+                mappedEvent = System.TriggerOperation.BEFORE_INSERT;
+            }
+            when afterInsert {
+                mappedEvent = System.TriggerOperation.AFTER_INSERT;
+            }
+            when beforeUpdate {
+                mappedEvent = System.TriggerOperation.BEFORE_UPDATE;
+            }
+            when afterUpdate {
+                mappedEvent = System.TriggerOperation.AFTER_UPDATE;
+            }
+            when beforeDelete {
+                mappedEvent = System.TriggerOperation.BEFORE_DELETE;
+            }
+            when afterDelete {
+                mappedEvent = System.TriggerOperation.AFTER_DELETE;
+            }
+            when afterUndelete {
+                mappedEvent = System.TriggerOperation.AFTER_UNDELETE;
+            }
+        }
+        return bind(mappedEvent, eh);
     }
 }

@@ -1,5 +1,5 @@
-public class TriggerConfigService {
-    public static Map<String, ObjectConfig> configMetadata {
+global class TriggerConfigService {
+    global static Map<String, ObjectConfig> configMetadata {
         get {
             if (configMetadata == null) {
                 configMetadata = buildConfigMap();
@@ -27,6 +27,7 @@ public class TriggerConfigService {
                         After_Undelete__c,
                         Before_Update__c,
                         After_Update__c
+                    //Debug_Errors__c
                     FROM Trigger_Handlers__r
                     ORDER BY Execution_Order__c ASC
                 )
@@ -41,16 +42,16 @@ public class TriggerConfigService {
         return resultsMap;
     }
 
-    public class ObjectConfig {
-        public String objName;
-        public Boolean enabled;
-        public Map<String, HandlerConfig> handlers = new Map<String, HandlerConfig>{};
-        public String[] handlerOrder = new List<String>{};
+    global class ObjectConfig {
+        global String objName;
+        global Boolean enabled;
+        global Map<String, HandlerConfig> handlers = new Map<String, HandlerConfig>{};
+        global String[] handlerOrder = new List<String>{};
 
-        public ObjectConfig() {
+        global ObjectConfig() {
         }
 
-        public ObjectConfig(Trigger_Object__mdt objMdt) {
+        global ObjectConfig(Trigger_Object__mdt objMdt) {
             objName = objMdt.DeveloperName.toLowerCase();
             enabled = objMdt.Enabled__c;
             handlers = new Map<String, HandlerConfig>{};
@@ -64,22 +65,23 @@ public class TriggerConfigService {
         }
     }
 
-    public class HandlerConfig {
-        public String className;
-        public Boolean enabled;
-        public Decimal order;
-        public Boolean beforeInsert;
-        public Boolean afterInsert;
-        public Boolean beforeUpdate;
-        public Boolean afterUpdate;
-        public Boolean beforeDelete;
-        public Boolean afterDelete;
-        public Boolean afterUndelete;
+    global class HandlerConfig {
+        global String className;
+        global Boolean enabled;
+        global Decimal order;
+        global Boolean beforeInsert;
+        global Boolean afterInsert;
+        global Boolean beforeUpdate;
+        global Boolean afterUpdate;
+        global Boolean beforeDelete;
+        global Boolean afterDelete;
+        global Boolean afterUndelete;
+        global Boolean debugErrors;
 
-        public HandlerConfig() {
+        global HandlerConfig() {
         }
 
-        public HandlerConfig(Trigger_Handler__mdt th) {
+        global HandlerConfig(Trigger_Handler__mdt th) {
             className = th.Handler_Class__c.toLowerCase();
             enabled = th.Enabled__c;
             order = th.Execution_Order__c;
@@ -90,6 +92,7 @@ public class TriggerConfigService {
             beforeDelete = th.Before_Delete__c;
             afterDelete = th.After_Delete__c;
             afterUndelete = th.After_Undelete__c;
+            //debugErrors = th.Debug_Errors__c;
         }
     }
 }
