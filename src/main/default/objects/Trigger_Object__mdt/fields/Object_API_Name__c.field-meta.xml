@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Object_API_Name__c</fullName>
+    <description>Use this field to store the custom object name. Cannot use the standard MDT Name field since you cannot put a double underscore for a &quot;CustomObject__c&quot;.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Use this field to store the custom object name. Cannot use the standard MDT Name field since you cannot put a double underscore for a &quot;CustomObject__c&quot;.
+
+Standard Label and Name fields are required by default, but only used for labeling.</inlineHelpText>
+    <label>Object API Name</label>
+    <length>255</length>
+    <required>true</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
