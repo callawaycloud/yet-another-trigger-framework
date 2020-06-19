@@ -92,6 +92,7 @@ global class TriggerConfigService {
             beforeDelete = th.Before_Delete__c;
             afterDelete = th.After_Delete__c;
             afterUndelete = th.After_Undelete__c;
+            debugErrors = false;
             //debugErrors = th.Debug_Errors__c;
         }
     }
