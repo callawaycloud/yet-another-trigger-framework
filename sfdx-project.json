@@ -4,8 +4,8 @@
             "path": "src",
             "default": true,
             "package": "CCC Trigger Handler",
-            "versionName": "ver 0.2",
-            "versionNumber": "0.2.0.NEXT"
+            "versionName": "ver 0.3",
+            "versionNumber": "0.3.0.NEXT"
         }
     ],
     "namespace": "YATH",
@@ -16,6 +16,7 @@
         "CCC Trigger Handler@0.1.0-1": "04t1C000000pQasQAE",
         "CCC Trigger Handler@0.1.0-2": "04t1C000000pQb2QAE",
         "CCC Trigger Handler@0.1.0-3": "04t1C000000pQbRQAU",
-        "CCC Trigger Handler@0.2.0-1": "04t1C000000pQbWQAU"
+        "CCC Trigger Handler@0.2.0-1": "04t1C000000pQbWQAU",
+        "CCC Trigger Handler@0.3.0-1": "04t1C000000pQcFQAU"
     }
 }
