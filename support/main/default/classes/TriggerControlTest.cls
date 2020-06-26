@@ -154,7 +154,7 @@ private class TriggerControlTest {
     @isTest
     private static void additionalCoverage() {
         Map<String, TriggerConfigService.ObjectConfig> forceGet = TriggerConfigService.configMetadata;
-        Trigger_Object__mdt objMdt = new Trigger_Object__mdt(DeveloperName = 'testerObj', Enabled__c = true);
+        Trigger_Object__mdt objMdt = new Trigger_Object__mdt(Object_API_Name__c = 'testerObj', Enabled__c = true);
         TriggerConfigService.ObjectConfig objConstructorTest = new TriggerConfigService.ObjectConfig(objMdt);
         Trigger_Handler__mdt handlerMdt = new Trigger_Handler__mdt(Handler_Class__c = 'testerHandler');
         TriggerConfigService.HandlerConfig handlerConstructorTest = new TriggerConfigService.HandlerConfig(handlerMdt);
