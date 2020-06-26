@@ -68,6 +68,7 @@ global class TriggerHandler {
 
         if (handlers != null && !handlers.isEmpty()) {
             for (HandlerInterface h : handlers) {
+                System.debug('Running handler: ' + getHandlerName(h));
                 if (h instanceof BaseTriggerHandler) {
                     ((BaseTriggerHandler) h).context = this.context;
                 }
@@ -89,6 +90,7 @@ global class TriggerHandler {
             return;
         }
         for (String handlerName : triggerConfig.handlerOrder) {
+            System.debug('Auto binding: ' + handlerName);
             TriggerConfigService.HandlerConfig handlerConfig = triggerConfig.handlers.get(handlerName);
             // do not bind if auto bind is off or if handler is disabled
             if (!handlerConfig.enabled) {
