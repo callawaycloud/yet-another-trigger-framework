@@ -3,8 +3,8 @@
         {
             "path": "src",
             "default": true,
-            "package": "CCC Trigger Handler",
-            "versionName": "ver 0.1",
+            "package": "CCCTriggerHandler",
+            "versionName": "ver 0.2",
             "versionNumber": "0.1.0.NEXT"
         }
     ],
@@ -12,8 +12,8 @@
     "sfdcLoginUrl": "https://login.salesforce.com",
     "sourceApiVersion": "48.0",
     "packageAliases": {
-        "CCC Trigger Handler": "0Ho1C000000TN1PSAW",
-        "CCC Trigger Handler@0.1.0-1": "04t1C000000pQasQAE",
-        "CCC Trigger Handler@0.1.0-2": "04t1C000000pQb2QAE"
+        "CCCTriggerHandler": "0Ho1C000000TN1USAW",
+        "CCCTriggerHandler@0.1.0-2": "04t1C000000pQcyQAE",
+        "CCCTriggerHandler@0.2.0-0": "04t1C000000pQd3QAE"
     }
 }

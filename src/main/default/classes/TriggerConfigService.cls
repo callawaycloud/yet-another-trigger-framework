@@ -13,7 +13,7 @@ global class TriggerConfigService {
     private static Map<String, ObjectConfig> buildConfigMap() {
         Trigger_Object__mdt[] allMtd = [
             SELECT
-                DeveloperName,
+                Object_API_Name__c,
                 Enabled__c,
                 (
                     SELECT
@@ -35,7 +35,7 @@ global class TriggerConfigService {
         ];
         Map<String, ObjectConfig> resultsMap = new Map<String, ObjectConfig>();
         for (Trigger_Object__mdt objMdt : allMtd) {
-            resultsMap.put(objMdt.DeveloperName.toLowerCase(), new ObjectConfig(objMdt));
+            resultsMap.put(objMdt.Object_API_Name__c.toLowerCase(), new ObjectConfig(objMdt));
         }
         if (allMtd.size() == 0) {
         }
@@ -52,7 +52,7 @@ global class TriggerConfigService {
         }
 
         global ObjectConfig(Trigger_Object__mdt objMdt) {
-            objName = objMdt.DeveloperName.toLowerCase();
+            objName = objMdt.Object_API_Name__c.toLowerCase();
             enabled = objMdt.Enabled__c;
             handlers = new Map<String, HandlerConfig>{};
             handlerOrder = new List<String>{};
@@ -92,7 +92,7 @@ global class TriggerConfigService {
             beforeDelete = th.Before_Delete__c;
             afterDelete = th.After_Delete__c;
             afterUndelete = th.After_Undelete__c;
-            //debugErrors = th.Debug_Errors__c;
+            debugErrors = false; // for now, always false until we test and implement
         }
     }
 }
