@@ -1,7 +1,7 @@
 # Installation
 
--   Go to [package installation url](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1C000000goLlQAI)
--   Or install with sfdx `sfdx force:package:install -p 04t1C000000goLlQAI -u target_alias_or_username -b 1000 -w 1000`
+-   Go to [package installation url](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1C000000pQcjQAE)
+-   Or install with sfdx `sfdx force:package:install -p 04t1C000000pQcjQAE -u target_alias_or_username -b 1000 -w 1000`
 
 # TODOS
 
