@@ -61,8 +61,8 @@ global class Manager {
         if (handlers != null && !handlers.isEmpty()) {
             for (Handler h : handlers) {
                 System.debug('Running handler: ' + getHandlerName(h));
-                if (h instanceof BaseTriggerHandler) {
-                    ((BaseTriggerHandler) h).context = this.context;
+                if (h instanceof BaseHandler) {
+                    ((BaseHandler) h).context = this.context;
                 }
                 if (isDebugOnly(h)) {
                     try {
