@@ -13,13 +13,13 @@ public class TriggerManageTests {
         Account[] records = new List<Account>{ new Account() };
 
         TriggerContext context = new TriggerContext(System.TriggerOperation.BEFORE_INSERT, records, null);
-        TriggerHandler th = new TriggerHandler(context);
+        Manager th = new Manager(context);
 
         TestHandler beforeInsertHandler = new TestHandler();
-        th.bind(TriggerHandler.Evt.beforeInsert, beforeInsertHandler);
+        th.bind(Manager.Evt.beforeInsert, beforeInsertHandler);
 
         TestHandler afterInsertHandler = new TestHandler();
-        th.bind(TriggerHandler.Evt.afterInsert, afterInsertHandler);
+        th.bind(Manager.Evt.afterInsert, afterInsertHandler);
 
         th.manage();
 
@@ -49,37 +49,37 @@ public class TriggerManageTests {
             new List<Account>{ a },
             new List<Account>{ a }
         );
-        TriggerHandler th = new TriggerHandler(tc);
+        Manager th = new Manager(tc);
         th.manage();
 
         // after insert
         tc = new TriggerContext(System.TriggerOperation.AFTER_INSERT, new List<Account>{ a }, new List<Account>{ a });
-        th = new TriggerHandler(tc);
+        th = new Manager(tc);
         th.manage();
 
         // before update
         tc = new TriggerContext(System.TriggerOperation.BEFORE_UPDATE, new List<Account>{ a }, new List<Account>{ a });
-        th = new TriggerHandler(tc);
+        th = new Manager(tc);
         th.manage();
 
         // after update
         tc = new TriggerContext(System.TriggerOperation.AFTER_UPDATE, new List<Account>{ a }, new List<Account>{ a });
-        th = new TriggerHandler(tc);
+        th = new Manager(tc);
         th.manage();
 
         // before delete
         tc = new TriggerContext(System.TriggerOperation.BEFORE_DELETE, new List<Account>{ a }, new List<Account>{ a });
-        th = new TriggerHandler(tc);
+        th = new Manager(tc);
         th.manage();
 
         // after delete
         tc = new TriggerContext(System.TriggerOperation.AFTER_DELETE, new List<Account>{ a }, new List<Account>{ a });
-        th = new TriggerHandler(tc);
+        th = new Manager(tc);
         th.manage();
 
         // after undelete
         tc = new TriggerContext(System.TriggerOperation.AFTER_UNDELETE, new List<Account>{ a }, new List<Account>{ a });
-        th = new TriggerHandler(tc);
+        th = new Manager(tc);
         th.manage();
     }
 
