@@ -95,7 +95,10 @@ public class TriggerManageTests {
         // coverage for the custom metadata dependant elements of the config
         Map<String, TriggerConfigService.ObjectConfig> objConfig = TriggerConfigService.configMetadata;
         Trigger_Object__mdt objMdt = new Trigger_Object__mdt(Object_API_Name__c = 'account', Enabled__c = true);
-        TriggerConfigService.ObjectConfig objWrapper = new TriggerConfigService.ObjectConfig(objMdt);
+        TriggerConfigService.ObjectConfig objWrapper = new TriggerConfigService.ObjectConfig(
+            objMdt.Enabled__c,
+            objMdt.Object_API_Name__c
+        );
 
         Trigger_Handler__mdt handlerMdt = new Trigger_Handler__mdt(
             Handler_Class__c = 'TriggerHandler',

@@ -1,8 +1,8 @@
 {
-    "name": "ccc_trigger_handler",
+    "name": "ccc_trigger_framework",
     "private": true,
     "version": "1.0.0",
-    "description": "CCC Trigger Handler",
+    "description": "CCC Trigger Framework",
     "scripts": {
         "pretty-all-apex": "npx prettier --write 'src/**/*.{trigger,cls}'",
         "release": "sfdx force:package:version:create -p 'CCC Trigger Handler' -w 1000 -x"

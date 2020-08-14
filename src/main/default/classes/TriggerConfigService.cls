@@ -11,31 +11,37 @@ global class TriggerConfigService {
 
     @testVisible
     private static Map<String, ObjectConfig> buildConfigMap() {
-        Trigger_Object__mdt[] allMtd = [
+        Trigger_Handler__mdt[] allMtd = [
             SELECT
-                Object_API_Name__c,
+                Handler_Class__c,
                 Enabled__c,
-                (
-                    SELECT
-                        Handler_Class__c,
-                        Enabled__c,
-                        Execution_Order__c,
-                        Before_Insert__c,
-                        After_Insert__c,
-                        Before_Delete__c,
-                        After_Delete__c,
-                        After_Undelete__c,
-                        Before_Update__c,
-                        After_Update__c
-                    //Debug_Errors__c
-                    FROM Trigger_Handlers__r
-                    ORDER BY Execution_Order__c ASC
-                )
-            FROM Trigger_Object__mdt
+                Execution_Order__c,
+                Before_Insert__c,
+                After_Insert__c,
+                Before_Delete__c,
+                After_Delete__c,
+                After_Undelete__c,
+                Before_Update__c,
+                After_Update__c,
+                Trigger_Object__r.Object_API_Name__c,
+                Trigger_Object__r.Enabled__c
+            //Debug_Errors__c
+            FROM Trigger_Handler__mdt
+            ORDER BY Execution_Order__c ASC
         ];
         Map<String, ObjectConfig> resultsMap = new Map<String, ObjectConfig>();
-        for (Trigger_Object__mdt objMdt : allMtd) {
-            resultsMap.put(objMdt.Object_API_Name__c.toLowerCase(), new ObjectConfig(objMdt));
+        for (Trigger_Handler__mdt handler : allMtd) {
+            ObjectConfig objectConfig;
+            HandlerConfig handlerConfig = new HandlerConfig(handler);
+            String objName = handler.Trigger_Object__r.Object_API_Name__c.toLowerCase();
+            if (!resultsMap.containsKey(objName)) {
+                objectConfig = new objectConfig(handler.Trigger_Object__r.Enabled__c, objName);
+            } else {
+                objectConfig = resultsMap.get(objName);
+            }
+            objectConfig.handlers.put(handler.Handler_Class__c.toLowerCase(), handlerConfig);
+            objectConfig.handlerOrder.add(handler.Handler_Class__c);
+            resultsMap.put(objName, objectConfig);
         }
         if (allMtd.size() == 0) {
         }
@@ -51,17 +57,11 @@ global class TriggerConfigService {
         global ObjectConfig() {
         }
 
-        global ObjectConfig(Trigger_Object__mdt objMdt) {
-            objName = objMdt.Object_API_Name__c.toLowerCase();
-            enabled = objMdt.Enabled__c;
+        global ObjectConfig(Boolean enabled, String objName) {
+            this.objName = objName;
+            this.enabled = enabled;
             handlers = new Map<String, HandlerConfig>{};
             handlerOrder = new List<String>{};
-
-            for (Trigger_Handler__mdt th : objMdt.Trigger_Handlers__r) {
-                String handlerName = th.Handler_Class__c.toLowerCase();
-                handlers.put(handlerName, new HandlerConfig(th));
-                handlerOrder.add(handlerName);
-            }
         }
     }
 
