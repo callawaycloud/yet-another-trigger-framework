@@ -4,5 +4,5 @@
  */
 global abstract class BaseTriggerHandler implements TriggerHandler.HandlerInterface {
     // injected Trigger Context
-    global TriggerContext context;
+    global TriggerContext context = new TriggerContext();
 }

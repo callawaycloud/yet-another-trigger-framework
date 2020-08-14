@@ -40,7 +40,7 @@ global class TriggerConfigService {
                 objectConfig = resultsMap.get(objName);
             }
             objectConfig.handlers.put(handler.Handler_Class__c.toLowerCase(), handlerConfig);
-            objectConfig.handlerOrder.add(handler.Handler_Class__c);
+            objectConfig.handlerOrder.add(handler.Handler_Class__c.toLowerCase());
             resultsMap.put(objName, objectConfig);
         }
         if (allMtd.size() == 0) {
