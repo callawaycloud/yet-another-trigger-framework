@@ -1,9 +1,34 @@
 # Installation
+-   Prod install URL: https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1C000000xAewQAE
+-   Sanndobx install URL: https://test.salesforce.com/packaging/installPackage.apexp?p0=04t1C000000xAewQAE
+-   Or install with sfdx `sfdx force:package:install -p 04t1C000000xAewQAE -u {TARGET ALIAS OR USERNAME} -b 1000 -w 1000`
 
--   Go to [package installation url](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1C000000pQcjQAE)
--   Or install with sfdx `sfdx force:package:install -p 04t1C000000pQcjQAE -u target_alias_or_username -b 1000 -w 1000`
+# Implementation
 
-# TODOS
+There are different levels of implementation that can be performed. If migrating from the existing org specific TriggerHandler class, it's fairly easy to just remove the TriggerHandler related classes and do a quick search and replace for the handlers.
+
+## Basic Implementation - Convert from existing TriggerHandler class
+
+1) Replace all implementations of "TriggerHandler.HandlerInterface" with "YATH.Handler"
+
+2) Replace all instances of TriggerHandler class with YATH.Manager. (Good way to do this is prefix with a space in your search and replace - " TriggerHandler" with "YATH.TriggerHandler"
+
+## Auto binding implementation - Remove explicit bindings in triggers and replace with metadata
+
+1) Ensure all master triggers execute on all events. In some cases you might have triggers that only fire on a couple of events. Since the trigger doesn't know what handlers it will be firing, we should just put all events on all triggers:
+
+`trigger AccountMaster on Account(
+    after insert,
+    after update,
+    after delete,
+    after undelete,
+    before insert,
+    before update,
+    before delete
+) {
+//...
+}
+`
 
 ## Alpha
 
