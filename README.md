@@ -13,6 +13,8 @@ There are different levels of implementation that can be performed. If migrating
 
 2) Replace all instances of TriggerHandler class with YATH.Manager. (Good way to do this is prefix with a space in your search and replace - " TriggerHandler" with "YATH.TriggerHandler"
 
+3) Delete "TriggerHandler" class from org
+
 ## Auto binding implementation - Remove explicit bindings in triggers and replace with metadata
 
 1) Ensure all master triggers execute on all events. In some cases you might have triggers that only fire on a couple of events. Since the trigger doesn't know what handlers it will be firing, we should just put all events on all triggers:
