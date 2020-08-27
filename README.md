@@ -1,25 +1,76 @@
-# Installation
--   Prod install URL: https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1C000000xAewQAE
--   Sanndobx install URL: https://test.salesforce.com/packaging/installPackage.apexp?p0=04t1C000000xAewQAE
--   Or install with sfdx `sfdx force:package:install -p 04t1C000000xAewQAE -u {TARGET ALIAS OR USERNAME} -b 1000 -w 1000`
+# Yet-Another-Trigger-Framework
 
-# Implementation
+This "framework" is an extension of the [`TriggerHandler` pattern which original shipped with Mavensmate](https://github.com/joeferraro/MavensMate-Templates/blob/master/ApexClass/TriggerHandler.cls).
 
-There are different levels of implementation that can be performed. If migrating from the existing org specific TriggerHandler class, it's fairly easy to just remove the TriggerHandler related classes and do a quick search and replace for the handlers.
+The goal of this project is to improve upon that class, by adding additional configuration and capabilities, while at the same time **retaining full backwards compatibility**.
 
-## Basic Implementation - Convert from existing TriggerHandler class
+## Features
 
-1) Replace all implementations of "TriggerHandler.HandlerInterface" with "YATH.Handler"
+-   Dynamic Binding of Trigger Handlers via Custom Metadata (similar to table based trigger)
+-   Ability to disable whole triggers or individual handlers
+-   Easy to upgrade, full backwards compatibility
+-   Ability to decouple your handlers from the system static `Trigger`context, which allows for better unit testability (no need to actually run DML in tests)
 
-2) Replace all instances of TriggerHandler class with YATH.Manager. (Good way to do this is prefix with a space in your search and replace - " TriggerHandler" with "YATH.TriggerHandler"
+## Coming Soon
 
-3) Delete "TriggerHandler" class from org
+-   Dynamic error handling strategies
+-   logging/notifications
+-   built in recursion control
+-   support for other popular framework patterns ((sfdc-trigger-framework)[https://github.com/kevinohara80/sfdc-trigger-framework])
 
-## Auto binding implementation - Remove explicit bindings in triggers and replace with metadata
+## Installation
 
-1) Ensure all master triggers execute on all events. In some cases you might have triggers that only fire on a couple of events. Since the trigger doesn't know what handlers it will be firing, we should just put all events on all triggers:
+-   (Package URL)[https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1C000000xAewQAE] (replace host as needed)
 
-`trigger AccountMaster on Account(
+-   command line: `sfdx force:package:install -p 04t1C000000xAewQAE -u {TARGET ALIAS OR USERNAME} -b 1000 -w 1000`
+
+## Usage
+
+At it's most basic, the concept is very simple:
+
+1. Create a class that `implements YATF.Handler`
+1. Write a `void handle(){}` method to perform the trigger logic
+1. Create a trigger (one trigger per object!) and bind your handlers to the appropriate events.
+
+#### Example:
+
+```java
+public class AccountGreeter implements YATF.Handler{
+  public void handler(){
+    for(Account acc : (Account[]) Trigger.new){
+      System.debug('Hello ' + acc.Name);
+    }
+  }
+}
+```
+
+#### Decoupled Handler
+
+The design is not finalized, but the basic idea is to pass in or inject a proxy to the static `Trigger` variable (see [`TriggerContext`](https://github.com/joeferraro/MavensMate-Templates/tree/master/ApexClass/TriggerContext)). This will allow you to define your own context during unit tests.
+
+### Binding
+
+#### Static Binding
+
+```java
+trigger AccountTrigger on Account(before insert){
+  YATF.Manager m = new YATF.Manager();
+  AccountGreeter greeter = new HelloHandler();
+  m.bind(System.TriggerOperation.BEFORE_INSERT, greeter);
+  m.manage();
+}
+```
+
+#### Dynamic Binding
+
+In order to take advantage of configuration based features (disabling handlers, etc), we must dynamically bind our handlers to the trigger Manager.
+
+To do this for the above example:
+
+1. update the `.trigger` to fire on all event:
+
+```java
+trigger AccountMaster on Account(
     after insert,
     after update,
     after delete,
@@ -28,42 +79,39 @@ There are different levels of implementation that can be performed. If migrating
     before update,
     before delete
 ) {
-//...
-}
-`
+```
 
-## Alpha
+_WARNING: this is technically not required. The performance impact of binding to all events is untested. If you are concerned, only bind the events you are using!_
 
--   custom metadata
--   test it out in live scenario
--   yo ccc, clear pipelines, run pretty
--   readme with installation link
+2. Setup the Custom Metadata
 
-## Beta
+-   navigate to `setup -> Custom Metadata -> Trigger Object -> manage`
+-   create a new Record.
+    -   Set the `Object API Name` field to "Account"
+    -   Save
+-   create a new child `Trigger Handler`
+    -   Set the `Handler Class` to "AccountGreeter"
+    -   Check the `Before Update` box
 
--   readme with usage instructions
--   useful descriptions/help text on fields and objects
--   code commenting and formatting
--   add validation rule to require at least one field on metadata to be set
+_NOTES_:
 
-## Other General
+-   Dynamic Binding and Static binding can co-exist! Statically will execute first.
+-   You can create a dynamic configuration for a statically bound trigger. The handler will **only execute one time per event**, but this allows you to disable a handler without having to deploy code.
 
--   add contribution guidelines
--   add development instructions
-    -   setup scratch org
-    -   testing
-    -   contribution guidelines
--   setup commands
-    -   run all tests
-    -   verify format
-    -   create version
-        -   verify tests pass
-        -   push package version
-        -   update installation url in readme?
+## Upgrading from Mavensmate "TriggerHandler"
 
-## Feature Improvements
+1. Replace all instances of `TriggerHandler.HandlerInterface` with `YATF.Handler`
 
--   add off for events
--   inject handlers from metadata instead of disabling
--   configurable recursion prevention (requires switching to injection)
--   configurable perf logging (cpu time, db time, dml usage, query usage, heap size) (requires injection)
+1. Replace all instances of `TriggerHandler` class with `YATF.Manager`.
+
+1. Delete the `TriggerHandler` class from org
+
+That's it! There should be no functional changes, but it's a good idea to run all unit tests before and after to confirm.
+
+## Contributing
+
+Please do! We will try to incorporate all reasonable ideas.
+
+## License
+
+MIT
