@@ -1,10 +1,12 @@
-# Yet-Another-Trigger-Framework
+# ⚡️🤘⚡️ Yet-Another-Trigger-Framework ⚡️🤘⚡️
 
-This "framework" is an extension of the [`TriggerHandler` pattern which original shipped with Mavensmate](https://github.com/joeferraro/MavensMate-Templates/blob/master/ApexClass/TriggerHandler.cls).
+_This "framework" is an extension of the [`TriggerHandler` pattern which original shipped with Mavensmate](https://github.com/joeferraro/MavensMate-Templates/blob/master/ApexClass/TriggerHandler.cls)_
+
+# 💪Goals
 
 The goal of this project is to improve upon that class, by adding additional configuration and capabilities, while at the same time **retaining full backwards compatibility**.
 
-## Features
+## ✨Features
 
 -   Dynamic Binding of Trigger Handlers via Custom Metadata (similar to table based trigger)
 -   Ability to disable whole triggers or individual handlers
@@ -18,13 +20,13 @@ The goal of this project is to improve upon that class, by adding additional con
 -   built in recursion control
 -   support for other popular framework patterns ((sfdc-trigger-framework)[https://github.com/kevinohara80/sfdc-trigger-framework])
 
-## Installation
+## 📦Installation
 
 -   [Package URL](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1C000000xAewQAE]) (replace host as needed)
 
 -   command line: `sfdx force:package:install -p 04t1C000000xAewQAE -u {TARGET ALIAS OR USERNAME} -b 1000 -w 1000`
 
-## Usage
+## 🔨Usage
 
 At it's most basic, the concept is very simple:
 
@@ -110,10 +112,10 @@ _NOTES_:
 
 That's it! There should be no functional changes, but it's a good idea to run all unit tests before and after to confirm.
 
-## Contributing
+## 🤝Contributing
 
 Please do! We will try to incorporate all reasonable ideas.
 
-## License
+## 📝License
 
 MIT
