@@ -11,7 +11,7 @@ The goal of this project is to improve upon that class, by adding additional con
 -   Easy to upgrade, full backwards compatibility
 -   Ability to decouple your handlers from the system static `Trigger`context, which allows for better unit testability (no need to actually run DML in tests)
 
-## Coming Soon
+### Coming Soon
 
 -   Dynamic error handling strategies
 -   logging/notifications
@@ -20,7 +20,7 @@ The goal of this project is to improve upon that class, by adding additional con
 
 ## Installation
 
--   (Package URL)[https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1C000000xAewQAE] (replace host as needed)
+-   [Package URL](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1C000000xAewQAE]) (replace host as needed)
 
 -   command line: `sfdx force:package:install -p 04t1C000000xAewQAE -u {TARGET ALIAS OR USERNAME} -b 1000 -w 1000`
 
@@ -79,6 +79,8 @@ trigger AccountMaster on Account(
     before update,
     before delete
 ) {
+  new YATF.Manager().manage();
+}
 ```
 
 _WARNING: this is technically not required. The performance impact of binding to all events is untested. If you are concerned, only bind the events you are using!_
