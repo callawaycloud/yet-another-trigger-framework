@@ -46,7 +46,7 @@ public class AccountGreeter implements YATF.Handler{
 
 #### Decoupled Handler
 
-The design is not finalized, but the basic idea is to pass in or inject a proxy to the static `Trigger` variable (see [`TriggerContext`](https://github.com/joeferraro/MavensMate-Templates/tree/master/ApexClass/TriggerContext)). This will allow you to define your own context during unit tests.
+The design is not finalized, but the basic idea is to pass in or inject a proxy to the static `Trigger` variable (see [`TriggerContext`](https://github.com/callawaycloud/yet-another-trigger-framework/blob/master/src/main/default/classes/TriggerContext.cls)). This will allow you to define your own context during unit tests.
 
 ### Binding
 
