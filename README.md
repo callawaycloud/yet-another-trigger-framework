@@ -38,7 +38,7 @@ At it's most basic, the concept is very simple:
 
 ```java
 public class AccountGreeter implements YATF.Handler{
-  public void handler(){
+  public void handle(){
     for(Account acc : (Account[]) Trigger.new){
       System.debug('Hello ' + acc.Name);
     }
@@ -101,6 +101,23 @@ _NOTES_:
 
 -   Dynamic Binding and Static binding can co-exist! Statically will execute first.
 -   You can create a dynamic configuration for a statically bound trigger. The handler will **only execute one time per event**, but this allows you to disable a handler without having to deploy code.
+
+## Additional Feature Configuration
+
+### Disabling Triggers
+
+You can disable the trigger on the entire `SObject` or just a single `Handler`. Simply un-check the `Enabled` field on the respective record.
+
+_NOTE: You can disable a static bound trigger by adding a Handler Configuration!_
+
+## Built in Exception Handling
+
+When a trigger throws an uncaught exception, you can choose how it should be handled via the "On Exception" field:
+
+-   `Throw`: Just rethrows the error. Will cause the entire transaction to fail. This is the default.
+-   `Suppress`: Will only `System.Debug` the exception. The transaction will be Rolled back to before the handler ran.
+-   `Email`: Sends an email with the exception and trigger context details to recipients specified via "On Exception Email Recipients". The transaction will be Rolled back to before the handler ran.
+-   `Custom Handler`: Allows you to specify a custom class to handle the exception. Class specified via "On Exception Custom Handler" field. Must implement `CustomerExceptionHandler` interface. Transaction savepoint will be passed into the handler so it can control the rollback. If the custom handler fails, the transaction will be rolled back.
 
 ## Upgrading from Mavensmate "TriggerHandler"
 

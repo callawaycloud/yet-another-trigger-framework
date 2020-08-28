@@ -6,4 +6,8 @@
         <field>Enabled__c</field>
         <value xsi:type="xsd:boolean">true</value>
     </values>
+    <values>
+        <field>Object_API_Name__c</field>
+        <value xsi:type="xsd:string">Account</value>
+    </values>
 </CustomMetadata>

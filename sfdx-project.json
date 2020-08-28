@@ -1,28 +1,31 @@
 {
-    "namespace": "YATF",
-    "packageDirectories": [
-        {
-            "path": "src",
-            "default": true,
-            "package": "CCC Trigger Framework",
-            "versionNumber": "1.0.6.NEXT"
-        }
-    ],
-    "sfdcLoginUrl": "https://login.salesforce.com",
-    "sourceApiVersion": "48.0",
-    "packageAliases": {
-        "CCC Trigger Framework": "0Ho1C000000fxSQSAY",
-        "CCC Trigger Framework@1.0.0-1": "04t1C000000xAdoQAE",
-        "CCC Trigger Framework@1.0.0-2": "04t1C000000xAe8QAE",
-        "CCC Trigger Framework@1.0.0-3": "04t1C000000xAeDQAU",
-        "CCC Trigger Framework@1.0.1-1": "04t1C000000xAeIQAU",
-        "CCC Trigger Framework@1.0.2-1": "04t1C000000xAeNQAU",
-        "CCC Trigger Framework@1.0.3-1": "04t1C000000xAeSQAU",
-        "CCC Trigger Framework@1.0.3-2": "04t1C000000xAeXQAU",
-        "CCC Trigger Framework@1.0.4-1": "04t1C000000xAecQAE",
-        "CCC Trigger Framework@1.0.5-1": "04t1C000000xAehQAE",
-        "CCC Trigger Framework@1.0.5-2": "04t1C000000xAemQAE",
-        "CCC Trigger Framework@1.0.5-3": "04t1C000000xAerQAE",
-        "CCC Trigger Framework@1.0.6-1": "04t1C000000xAewQAE"
+  "namespace": "YATF",
+  "packageDirectories": [
+    {
+      "path": "src",
+      "default": true,
+      "package": "CCC Trigger Framework",
+      "versionNumber": "1.0.6.NEXT"
+    },
+    {
+      "path": "support"
     }
+  ],
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "48.0",
+  "packageAliases": {
+    "CCC Trigger Framework": "0Ho1C000000fxSQSAY",
+    "CCC Trigger Framework@1.0.0-1": "04t1C000000xAdoQAE",
+    "CCC Trigger Framework@1.0.0-2": "04t1C000000xAe8QAE",
+    "CCC Trigger Framework@1.0.0-3": "04t1C000000xAeDQAU",
+    "CCC Trigger Framework@1.0.1-1": "04t1C000000xAeIQAU",
+    "CCC Trigger Framework@1.0.2-1": "04t1C000000xAeNQAU",
+    "CCC Trigger Framework@1.0.3-1": "04t1C000000xAeSQAU",
+    "CCC Trigger Framework@1.0.3-2": "04t1C000000xAeXQAU",
+    "CCC Trigger Framework@1.0.4-1": "04t1C000000xAecQAE",
+    "CCC Trigger Framework@1.0.5-1": "04t1C000000xAehQAE",
+    "CCC Trigger Framework@1.0.5-2": "04t1C000000xAemQAE",
+    "CCC Trigger Framework@1.0.5-3": "04t1C000000xAerQAE",
+    "CCC Trigger Framework@1.0.6-1": "04t1C000000xAewQAE"
+  }
 }

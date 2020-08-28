@@ -15,6 +15,17 @@ global class TriggerContext {
     global Boolean isAfter = false;
     global Boolean isUndelete = false;
 
+    global String sObjectType {
+        get {
+            if (sObjectType == null) {
+                SObject firstRecord = isDelete ? oldRecords[0] : newRecords[0];
+                sObjectType = String.valueOf(firstRecord.getSObjectType()).toLowerCase();
+            }
+            return sObjectType;
+        }
+        set;
+    }
+
     @TestVisible
     private static boolean triggerCoverage = false;
 
@@ -34,6 +45,22 @@ global class TriggerContext {
             isAfter = !triggerCoverage ? Trigger.isAfter : false;
             isUndelete = !triggerCoverage ? Trigger.isUndelete : false;
         }
+    }
+
+    global TriggerContext(TriggerContext ctx) {
+        isExecuting = ctx.isExecuting;
+        operationType = ctx.operationType;
+        size = ctx.size;
+        newRecords = new List<SObject>(ctx.newRecords);
+        newRecordMap = new Map<Id, SObject>(ctx.newRecordMap);
+        oldRecords = new List<SObject>(ctx.oldRecords);
+        oldRecordMap = new Map<Id, SObject>(ctx.oldRecordMap);
+        isInsert = ctx.isInsert;
+        isUpdate = ctx.isUpdate;
+        isDelete = ctx.isDelete;
+        isBefore = ctx.isBefore;
+        isAfter = ctx.isAfter;
+        isUndelete = ctx.isUndelete;
     }
 
     @testvisible
