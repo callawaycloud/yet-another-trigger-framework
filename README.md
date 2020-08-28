@@ -18,7 +18,7 @@ The goal of this project is to improve upon that class, by adding additional con
 -   Dynamic error handling strategies
 -   logging/notifications
 -   built in recursion control
--   support for other popular framework patterns ((sfdc-trigger-framework)[https://github.com/kevinohara80/sfdc-trigger-framework])
+-   support for other popular framework patterns ([sfdc-trigger-framework](https://github.com/kevinohara80/sfdc-trigger-framework))
 
 ## 📦Installation
 
