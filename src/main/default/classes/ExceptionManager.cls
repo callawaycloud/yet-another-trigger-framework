@@ -7,13 +7,13 @@ public class ExceptionManager {
                 Database.rollback(sp);
             }
             when EMAIL {
+                Database.rollback(sp);
                 try {
                     sendEmail(e, context, config);
                 } catch (Exception emailException) {
                     //suppress or throw? Maybe we need a "Secondary Error Strategy" configuration point
                     System.debug(emailException);
                 }
-                Database.rollback(sp);
             }
             when CUSTOM {
                 try {
