@@ -1,11 +1,6 @@
 public class ExceptionManager {
-    public void manage(
-        Exception e,
-        TriggerContext context,
-        HandlerConfig config,
-        Savepoint sp
-    ) {
-        System.debug(JSON.serializePretty(e)); // probably not safe... could throw serialization error
+    public void manage(Exception e, TriggerContext context, HandlerConfig config, Savepoint sp) {
+        System.debug(e);
         switch on config.onException {
             when SUPPRESS {
                 System.debug('Exception Suppress!');
