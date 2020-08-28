@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>On_Exception__c</fullName>
+    <defaultValue>&quot;Throw&quot;</defaultValue>
+    <description>Determines what happens in the event the trigger handler throws an exception:
+
+Throw: The exception will be re-thrown
+Suppress: The exception will only be logged (not recommended!)
+Email: An email will be sent.  MUST ALSO SET Exception Email Recipients
+CustomHandler: Name of class implementing &quot;CustomExeptionHandler&quot; to run on exception</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>On Exception</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Throw</fullName>
+                <default>true</default>
+                <label>Throw</label>
+            </value>
+            <value>
+                <fullName>Suppress</fullName>
+                <default>false</default>
+                <label>Suppress</label>
+            </value>
+            <value>
+                <fullName>Email</fullName>
+                <default>false</default>
+                <label>Email</label>
+            </value>
+            <value>
+                <fullName>Custom Handler</fullName>
+                <default>false</default>
+                <label>Custom Handler</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

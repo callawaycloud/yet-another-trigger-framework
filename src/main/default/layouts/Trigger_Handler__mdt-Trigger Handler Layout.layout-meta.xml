@@ -10,6 +10,18 @@
                 <behavior>Required</behavior>
                 <field>MasterLabel</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>On_Exception__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>On_Exception_Email_Addresses__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>On_Exception_Custom_Handler__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
