@@ -75,10 +75,16 @@
         <style>CustomLinks</style>
     </layoutSections>
     <relatedLists>
-        <fields>MasterLabel</fields>
         <fields>DeveloperName</fields>
-        <fields>NamespacePrefix</fields>
+        <fields>MasterLabel</fields>
+        <fields>Handler_Class__c</fields>
+        <fields>Enabled__c</fields>
+        <fields>On_Exception__c</fields>
+        <fields>Create_Exception_Event__c</fields>
+        <fields>Execution_Order__c</fields>
         <relatedList>Trigger_Handler__mdt.Trigger_Object__c</relatedList>
+        <sortField>Execution_Order__c</sortField>
+        <sortOrder>Asc</sortOrder>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showHighlightsPanel>false</showHighlightsPanel>
@@ -86,7 +92,7 @@
     <showRunAssignmentRulesCheckbox>false</showRunAssignmentRulesCheckbox>
     <showSubmitAndAttachButton>false</showSubmitAndAttachButton>
     <summaryLayout>
-        <masterLabel>00h2D000000USov</masterLabel>
+        <masterLabel>00h0x0000011Zd2</masterLabel>
         <sizeX>4</sizeX>
         <sizeY>0</sizeY>
         <summaryLayoutStyle>Default</summaryLayoutStyle>
