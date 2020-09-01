@@ -46,6 +46,16 @@ public class AccountGreeter implements YATF.Handler{
 }
 ```
 
+## Upgrading from Mavensmate "TriggerHandler"
+
+1. Replace all instances of `TriggerHandler.HandlerInterface` with `YATF.Handler`
+
+1. Replace all instances of `TriggerHandler` class with `YATF.Manager`.
+
+1. Delete the `TriggerHandler` class from org
+
+That's it! There should be no functional changes, but it's a good idea to run all unit tests before and after to confirm.
+
 #### Decoupled Handler
 
 The design is not finalized, but the basic idea is to pass in or inject a proxy to the static `Trigger` variable (see [`TriggerContext`](https://github.com/callawaycloud/yet-another-trigger-framework/blob/master/src/main/default/classes/TriggerContext.cls)). This will allow you to define your own context during unit tests.
@@ -65,7 +75,7 @@ trigger AccountTrigger on Account(before insert){
 
 #### Dynamic Binding
 
-In order to take advantage of configuration based features (disabling handlers, etc), we must dynamically bind our handlers to the trigger Manager.
+Dynamic binding (or dependency injection) has the advantage of being able to switch out handlers without needed to deploy updates to the Trigger itself.
 
 To do this for the above example:
 
@@ -87,7 +97,9 @@ trigger AccountMaster on Account(
 
 _WARNING: this is technically not required. The performance impact of binding to all events is untested. If you are concerned, only bind the events you are using!_
 
-2. Setup the Custom Metadata
+2. Set the access modifier to `global`
+
+3. Setup the Custom Metadata
 
 -   navigate to `setup -> Custom Metadata -> Trigger Object -> manage`
 -   create a new Record.
@@ -100,7 +112,7 @@ _WARNING: this is technically not required. The performance impact of binding to
 _NOTES_:
 
 -   Dynamic Binding and Static binding can co-exist! Statically will execute first.
--   You can create a dynamic configuration for a statically bound trigger. The handler will **only execute one time per event**, but this allows you to disable a handler without having to deploy code.
+-   You can still configuration for a statically bound trigger. The handler will **only execute one time per event**, but this allows you to disable a handler or use built in exception handling without having to deploy code.
 
 ## Additional Feature Configuration
 
@@ -110,24 +122,41 @@ You can disable the trigger on the entire `SObject` or just a single `Handler`. 
 
 _NOTE: You can disable a static bound trigger by adding a Handler Configuration!_
 
-## Built in Exception Handling
+### Built in Exception Handling
 
-When a trigger throws an uncaught exception, you can choose how it should be handled via the "On Exception" field:
+When a trigger throws an uncaught exception, you can choose how it should be handled via the `On Exception` field:
 
--   `Throw`: Just rethrows the error. Will cause the entire transaction to fail. This is the default.
--   `Suppress`: Will only `System.Debug` the exception. The transaction will be Rolled back to before the handler ran.
--   `Email`: Sends an email with the exception and trigger context details to recipients specified via "On Exception Email Recipients". The transaction will be Rolled back to before the handler ran.
--   `Custom Handler`: Allows you to specify a custom class to handle the exception. Class specified via "On Exception Custom Handler" field. Must implement `CustomerExceptionHandler` interface. Transaction savepoint will be passed into the handler so it can control the rollback. If the custom handler fails, the transaction will be rolled back.
+-   `Throw`: Just rethrows the error. Will cause the entire trigger to fail. This is the default.
+-   `Rollback`: Creates a `Savepoint` prior to running handler and rolls back the transaction on exception. NOTE: this does NOT rollback changes made directly to the trigger context on `BEFORE` triggers.
+-   `Suppress`: Will only `System.Debug` the exception.
 
-## Upgrading from Mavensmate "TriggerHandler"
+### Exception Logging with Platform Events
 
-1. Replace all instances of `TriggerHandler.HandlerInterface` with `YATF.Handler`
+Additionally, by setting `Create_Exception_Event__c` the system will platform events named `Trigger_Handler_Exception__e` any time an uncaught exception is thrown. This event contains details of the thrown exception, the handler that failed and the trigger context.
 
-1. Replace all instances of `TriggerHandler` class with `YATF.Manager`.
+#### Registering Listeners
 
-1. Delete the `TriggerHandler` class from org
+You can register a listener to automatically run when a `Trigger_Handler_Exception__e` occurs by setting the `On_Exception_Event_Handler__c` field. The value must be the name of a `global` class which implements `ExceptionEventHandler`.
 
-That's it! There should be no functional changes, but it's a good idea to run all unit tests before and after to confirm.
+You can optionally use `On_Exception_Event_Handler_Props__c` to pass `json` properties which will be used to initialize the class.
+
+#### Built in Listeners
+
+##### `SendEmailExceptionEventHandler`
+
+Sends an email with the details of the exception to one or more recipients. Requires the following `On_Exception_Event_Handler_Props__c` properties
+
+`fromEmailAddress`: The ORG WIDE email address the email will be sent from
+`recipients`: `String[]` of emails to send the exceptions to.
+
+Example JSON:
+
+```json
+{
+    "fromEmailAddress": "james.bond@callaway.cloud",
+    "recipients": ["john@example.com", "jane@example.com"]
+}
+```
 
 ## 🤝Contributing
 

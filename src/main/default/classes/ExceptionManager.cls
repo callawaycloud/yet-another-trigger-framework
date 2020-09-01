@@ -1,57 +1,43 @@
+/**
+ * Control logic for uncaught `Handler` exceptions
+ */
 public class ExceptionManager {
+    //messages that will be sent before
     public void manage(Exception e, TriggerContext context, HandlerConfig config, Savepoint sp) {
-        System.debug(e);
-        switch on config.onException {
-            when SUPPRESS {
-                System.debug('Exception Suppress!');
-                Database.rollback(sp);
-            }
-            when EMAIL {
-                Database.rollback(sp);
-                try {
-                    sendEmail(e, context, config);
-                } catch (Exception emailException) {
-                    //suppress or throw? Maybe we need a "Secondary Error Strategy" configuration point
-                    System.debug(emailException);
-                }
-            }
-            when CUSTOM {
-                try {
-                    CustomExceptionHandler errHandler = (CustomExceptionHandler) Utils.constructFromName(
-                        config.exceptionHandlerClassName
-                    );
-                    errHandler.handle(e, context, config, sp);
-                } catch (Exception customHandlerException) {
-                    //suppress or throw? Maybe we need a "Secondary Error Strategy" configuration point
-                    System.debug(customHandlerException);
-                    Database.rollback(sp);
-                }
-            }
-            when else {
-                throw e;
-            }
+        if (sp != null) {
+            Database.rollback(sp);
         }
-        // should we provide configuration over rollbacks?
-        //  Maybe seems like it should always happen when the exception is handled
+
+        publishEvent(e, context, config);
+
+        if (config.onException == HandlerConfig.ExceptionStrategy.RETHROW) {
+            throw e;
+        }
     }
 
-    private void sendEmail(Exception e, TriggerContext context, HandlerConfig config) {
-        Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-        email.setSubject(
-            String.format(
-                'An exception occurred in {0} trigger during {1}',
-                new List<String>{ context.sObjectType, config.className }
-            )
-        );
-        email.setPlainTextBody(
-            String.format(
-                '===Exception===\n{0} \n{1} \n===Context===\n{2}',
-                new List<String>{ e.getMessage(), e.getStackTraceString(), JSON.serializePretty(context) }
-            )
-        );
-        email.setToAddresses(config.exceptionEmailRecipients);
-        if (!Test.isRunningTest()) {
-            Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ email });
+    private void publishEvent(Exception e, TriggerContext context, HandlerConfig config) {
+        if (config.createExceptionEvent) {
+            EventBus.publish(
+                new List<Trigger_Handler_Exception__e>{
+                    new Trigger_Handler_Exception__e(
+                        User_Name__c = System.UserInfo.getUserName(),
+                        Exception_Type__c = e.getTypeName(),
+                        Exception_Message__c = e.getMessage(),
+                        Stack_Trace__c = e.getStackTraceString(),
+                        Handler_Config_Id__c = config.id,
+                        Handler_Config__c = JSON.serialize(config),
+                        SObject_Type__c = context.sObjectType,
+                        Trigger_Operation__c = context.operationType.name(),
+                        size__c = context.size,
+                        New_Records__c = context.newRecords != null
+                            ? JSON.serialize(context.newRecords).abbreviate(131072)
+                            : null,
+                        Old_Records__c = context.oldRecords != null
+                            ? JSON.serialize(context.oldRecords).abbreviate(131072)
+                            : null
+                    )
+                }
+            );
         }
     }
 }

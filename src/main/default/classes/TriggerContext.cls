@@ -3,6 +3,7 @@ global class TriggerContext {
     global boolean isExecuting;
     global System.TriggerOperation operationType;
     global Integer size;
+
     global SObject[] newRecords;
     global Map<Id, SObject> newRecordMap;
     global SObject[] oldRecords;
@@ -45,22 +46,6 @@ global class TriggerContext {
             isAfter = !triggerCoverage ? Trigger.isAfter : false;
             isUndelete = !triggerCoverage ? Trigger.isUndelete : false;
         }
-    }
-
-    global TriggerContext(TriggerContext ctx) {
-        isExecuting = ctx.isExecuting;
-        operationType = ctx.operationType;
-        size = ctx.size;
-        newRecords = new List<SObject>(ctx.newRecords);
-        newRecordMap = new Map<Id, SObject>(ctx.newRecordMap);
-        oldRecords = new List<SObject>(ctx.oldRecords);
-        oldRecordMap = new Map<Id, SObject>(ctx.oldRecordMap);
-        isInsert = ctx.isInsert;
-        isUpdate = ctx.isUpdate;
-        isDelete = ctx.isDelete;
-        isBefore = ctx.isBefore;
-        isAfter = ctx.isAfter;
-        isUndelete = ctx.isUndelete;
     }
 
     @testvisible

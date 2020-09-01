@@ -82,7 +82,10 @@ global class Manager {
                 if (config.handler instanceof BaseHandler) {
                     ((BaseHandler) config.handler).context = this.context;
                 }
-                Savepoint sp = Database.setSavePoint();
+                Savepoint sp = config.onException == HandlerConfig.ExceptionStrategy.USE_SAVEPOINT
+                    ? Database.setSavePoint()
+                    : null;
+
                 try {
                     config.handler.handle();
                 } catch (Exception e) {

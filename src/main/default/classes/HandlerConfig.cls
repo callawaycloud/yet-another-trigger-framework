@@ -4,13 +4,13 @@
 global class HandlerConfig {
     global enum ExceptionStrategy {
         RETHROW,
-        SUPPRESS,
-        EMAIL,
-        CUSTOM
+        USE_SAVEPOINT,
+        SUPPRESS
     }
 
-    global Handler handler;
+    global transient Handler handler;
 
+    global String id;
     global String className;
     global Boolean enabled;
     global Decimal order;
@@ -21,9 +21,12 @@ global class HandlerConfig {
     global Boolean beforeDelete;
     global Boolean afterDelete;
     global Boolean afterUndelete;
+
+    //Error Handling
     global ExceptionStrategy onException;
-    global List<String> exceptionEmailRecipients;
+    global Boolean createExceptionEvent;
     global String exceptionHandlerClassName;
+    // global Map<String, Object> additionalExceptionConfiguration;
 
     global HandlerConfig() {
     }
@@ -41,6 +44,7 @@ global class HandlerConfig {
      * Constructor used for dynamic bound handlers
      */
     global HandlerConfig(Trigger_Handler__mdt th) {
+        id = th.Id;
         className = th.Handler_Class__c.toLowerCase();
         enabled = th.Enabled__c;
         order = th.Execution_Order__c;
@@ -51,25 +55,19 @@ global class HandlerConfig {
         beforeDelete = th.Before_Delete__c;
         afterDelete = th.After_Delete__c;
         afterUndelete = th.After_Undelete__c;
+
+        // error management
         onException = ExceptionStrategy.RETHROW;
         switch on th.On_Exception__c {
             when 'Suppress' {
                 onException = ExceptionStrategy.SUPPRESS;
             }
-            when 'Email' {
-                if (!String.isEmpty(th.On_Exception_Email_Addresses__c)) {
-                    onException = ExceptionStrategy.EMAIL;
-                    exceptionEmailRecipients = th.On_Exception_Email_Addresses__c.split(',');
-                }
-            }
-            when 'Custom Handler' {
-                if (!String.isEmpty(th.On_Exception_Custom_Handler__c)) {
-                    onException = ExceptionStrategy.CUSTOM;
-                    exceptionHandlerClassName = th.On_Exception_Custom_Handler__c;
-                } else {
-                    System.debug('WARNING: "On_Exception__c" set to "Custom Handler" but handler was not specified.');
-                }
+            when 'Rollback' {
+                onException = ExceptionStrategy.USE_SAVEPOINT;
             }
         }
+
+        createExceptionEvent = th.Create_Exception_Event__c;
+        exceptionHandlerClassName = th.On_Exception_Event_Handler__c;
     }
 }

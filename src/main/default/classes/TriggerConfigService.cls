@@ -33,8 +33,8 @@ global class TriggerConfigService {
                 Trigger_Object__r.Object_API_Name__c,
                 Trigger_Object__r.Enabled__c,
                 On_Exception__c,
-                On_Exception_Email_Addresses__c,
-                On_Exception_Custom_Handler__c
+                Create_Exception_Event__c,
+                On_Exception_Event_Handler__c
             FROM Trigger_Handler__mdt
             ORDER BY Execution_Order__c ASC
         ];

@@ -16,11 +16,15 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>On_Exception_Email_Addresses__c</field>
+                <field>Create_Exception_Event__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>On_Exception_Custom_Handler__c</field>
+                <field>On_Exception_Event_Handler__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>On_Exception_Event_Handler_Props__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>

@@ -5,10 +5,23 @@ public class Utils {
     }
 
     public static Object constructFromName(String className) {
+        return constructFromName(className, null);
+    }
+
+    public static Object constructFromName(String className, String props) {
         Type t = Type.forName(className);
         if (t == null) {
             throw new TypeException(className + ' does not exist');
         }
-        return t.newInstance();
+        if (props == null) {
+            return t.newInstance();
+        } else {
+            return JSON.deserialize(props, t);
+        }
+    }
+
+    public static Object parseEnum(string enumString, Type enumType) {
+        Type cType = Type.forName(String.format('List<{0}>', new List<String>{ enumType.getName() }));
+        return ((List<Object>) JSON.deserialize(String.format('["{0}"]', new List<String>{ enumString }), cType))[0];
     }
 }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>On_Exception_Custom_Handler__c</fullName>
-    <description>CustomExceptionHandler class to run when an exception occurs.  &quot;On Exception&quot; must be set to &quot;Custom Handler&quot; for this to have an impact</description>
+    <fullName>On_Exception_Event_Handler__c</fullName>
+    <description>A handler that implements &quot;ExceptionEventHandler&quot;.  Additional Configuration can be passed in via &quot;Exception Event Handler Config&quot;</description>
     <externalId>false</externalId>
     <fieldManageability>DeveloperControlled</fieldManageability>
-    <label>On Exception Custom Handler</label>
+    <label>On Exception Event Handler</label>
     <length>255</length>
     <required>false</required>
     <type>Text</type>
