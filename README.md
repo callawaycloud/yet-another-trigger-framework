@@ -161,6 +161,8 @@ The design is not finalized, but the basic idea is to pass in or inject a proxy 
 
 1. Replace all instances of `TriggerHandler` class with `YATF.Manager`.
 
+1. Update all references of `TriggerHandler.Evt` to either `TriggerOperation` or `Manager.EVT` (easier to refactor but will be deprecated at some point).
+
 1. Delete the `TriggerHandler` class from org
 
 That's it! There should be no functional changes, but it's a good idea to run all unit tests before and after to confirm.
