@@ -6,7 +6,7 @@ public class TriggerManageTests {
         Map<String, TriggerConfigService.ObjectConfig> mdt = new Map<String, TriggerConfigService.ObjectConfig>();
         TriggerConfigService.ObjectConfig acct = generateObjTestData('account', true);
         // all events on handler set to false - allows for static binding
-        TriggerConfigService.HandlerConfig handler = generateHandlerTestData('TestHandler', true);
+        HandlerConfig handler = generateHandlerTestData('TestHandler', true);
         acct = addChildHandlerToObj(acct, handler);
         mdt.put('account', acct);
         TriggerConfigService.configMetadata = mdt;
@@ -31,7 +31,7 @@ public class TriggerManageTests {
     private static void testAllHandlerEvts() {
         Map<String, TriggerConfigService.ObjectConfig> mdt = new Map<String, TriggerConfigService.ObjectConfig>();
         TriggerConfigService.ObjectConfig acct = generateObjTestData('account', true);
-        TriggerConfigService.HandlerConfig handler = generateHandlerTestData('TestHandler', true);
+        HandlerConfig handler = generateHandlerTestData('TestHandler', true);
         handler.beforeInsert = true;
         handler.afterInsert = true;
         handler.beforeUpdate = true;
@@ -113,7 +113,7 @@ public class TriggerManageTests {
             After_Update__c = false
         );
 
-        TriggerConfigService.HandlerConfig handlerWrapper = new TriggerConfigService.HandlerConfig(handlerMdt);
+        HandlerConfig handlerWrapper = new HandlerConfig(handlerMdt);
     }
 
     private static TriggerConfigService.ObjectConfig generateObjTestData(String objName, Boolean enabled) {
@@ -123,8 +123,8 @@ public class TriggerManageTests {
         return trigObj;
     }
 
-    private static TriggerConfigService.HandlerConfig generateHandlerTestData(String className, Boolean enabled) {
-        TriggerConfigService.HandlerConfig handler = new TriggerConfigService.HandlerConfig();
+    private static HandlerConfig generateHandlerTestData(String className, Boolean enabled) {
+        HandlerConfig handler = new HandlerConfig();
         handler.className = className;
         handler.enabled = enabled;
         handler.order = 0;
@@ -140,10 +140,10 @@ public class TriggerManageTests {
 
     private static TriggerConfigService.ObjectConfig addChildHandlerToObj(
         TriggerConfigService.ObjectConfig obj,
-        TriggerConfigService.HandlerConfig handler
+        HandlerConfig handler
     ) {
         if (obj.handlers == null) {
-            obj.handlers = new Map<String, TriggerConfigService.HandlerConfig>();
+            obj.handlers = new Map<String, HandlerConfig>();
         }
         obj.handlers.put(handler.className, handler);
         obj.handlerOrder.add(handler.className);

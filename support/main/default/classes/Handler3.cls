@@ -1,4 +1,4 @@
-public without sharing class Handler3 extends BaseTriggerHandler {
+public without sharing class Handler3 extends BaseHandler {
     public static Set<String> events;
     public void handle() {
         if (events == null) {

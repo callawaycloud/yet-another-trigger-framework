@@ -7,9 +7,9 @@ trigger AccountMaster on Account(
     before update,
     before delete
 ) {
-    TriggerHandler handler = new TriggerHandler();
+    Manager handler = new Manager();
     // manually auto-bind Handler1, directly bind Handler2
     //handler.bind(TriggerHandler.Evt.beforeUpdate, new Handler1());
-    handler.bind(TriggerHandler.Evt.beforeInsert, new Handler2());
+    handler.bind(Manager.Evt.beforeInsert, new Handler2());
     handler.manage();
 }

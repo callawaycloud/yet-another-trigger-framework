@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Create_Exception_Event__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Will create an Exception Platform event which can then we monitored and handled asynchronously</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Will create an Exception Platform event which can then we monitored and handled asynchronously</inlineHelpText>
+    <label>Create Exception Event</label>
+    <type>Checkbox</type>
+</CustomField>

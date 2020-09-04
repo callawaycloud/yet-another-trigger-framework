@@ -83,7 +83,7 @@ private class TriggerControlTest {
     private static void runAllEvents() {
         Map<String, TriggerConfigService.ObjectConfig> mdt = new Map<String, TriggerConfigService.ObjectConfig>();
         TriggerConfigService.ObjectConfig acct = generateObjTestData('account', true);
-        TriggerConfigService.HandlerConfig h3 = new TriggerConfigService.HandlerConfig();
+        HandlerConfig h3 = new HandlerConfig();
         h3.className = 'handler3';
         h3.enabled = true;
         h3.order = 0;
@@ -123,7 +123,7 @@ private class TriggerControlTest {
         //objConfig.disabledHandlers.clear();
         objConfig.handlerOrder.clear();
         objConfig.handlers.clear();
-        TriggerConfigService.HandlerConfig handlerConfig = generateHandlerTestData('badNameClass', true);
+        HandlerConfig handlerConfig = generateHandlerTestData('badNameClass', true);
         addChildHandlerToObj(objConfig, handlerConfig);
         mdt.put('contact', objConfig);
         TriggerConfigService.configMetadata = mdt;
@@ -138,7 +138,7 @@ private class TriggerControlTest {
     private static void duplicateBindingTest() {
         Map<String, TriggerConfigService.ObjectConfig> mdt = buildMetadata();
         TriggerConfigService.ObjectConfig objConfig = mdt.get('contact');
-        TriggerConfigService.HandlerConfig handlerConfig = generateHandlerTestData('handler1', true);
+        HandlerConfig handlerConfig = generateHandlerTestData('handler1', true);
         addChildHandlerToObj(objConfig, handlerConfig);
         mdt.put('contact', objConfig);
         TriggerConfigService.configMetadata = mdt;
@@ -155,9 +155,9 @@ private class TriggerControlTest {
     private static void additionalCoverage() {
         Map<String, TriggerConfigService.ObjectConfig> forceGet = TriggerConfigService.configMetadata;
         Trigger_Object__mdt objMdt = new Trigger_Object__mdt(Object_API_Name__c = 'testerObj', Enabled__c = true);
-        TriggerConfigService.ObjectConfig objConstructorTest = new TriggerConfigService.ObjectConfig(objMdt);
+        // TriggerConfigService.ObjectConfig objConstructorTest = new TriggerConfigService.ObjectConfig(objMdt);
         Trigger_Handler__mdt handlerMdt = new Trigger_Handler__mdt(Handler_Class__c = 'testerHandler');
-        TriggerConfigService.HandlerConfig handlerConstructorTest = new TriggerConfigService.HandlerConfig(handlerMdt);
+        HandlerConfig handlerConstructorTest = new HandlerConfig(handlerMdt);
     }
 
     private static void runTest(Boolean acctHandler1Fired, Boolean acctHandler2Fired, Boolean contactHandler1Fired) {
@@ -178,8 +178,8 @@ private class TriggerControlTest {
     }
 
     // Add additional params for each trigger evt?
-    private static TriggerConfigService.HandlerConfig generateHandlerTestData(String className, Boolean enabled) {
-        TriggerConfigService.HandlerConfig handler = new TriggerConfigService.HandlerConfig();
+    private static HandlerConfig generateHandlerTestData(String className, Boolean enabled) {
+        HandlerConfig handler = new HandlerConfig();
         handler.className = className;
         handler.enabled = enabled;
         //handler.autoBind = true;
@@ -196,10 +196,10 @@ private class TriggerControlTest {
 
     private static TriggerConfigService.ObjectConfig addChildHandlerToObj(
         TriggerConfigService.ObjectConfig obj,
-        TriggerConfigService.HandlerConfig handler
+        HandlerConfig handler
     ) {
         if (obj.handlers == null) {
-            obj.handlers = new Map<String, TriggerConfigService.HandlerConfig>();
+            obj.handlers = new Map<String, HandlerConfig>();
         }
         obj.handlers.put(handler.className, handler);
         obj.handlerOrder.add(handler.className);

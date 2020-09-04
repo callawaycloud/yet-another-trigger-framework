@@ -1,12 +1,19 @@
 global class TriggerConfigService {
-    global static Map<String, ObjectConfig> configMetadata {
-        get {
-            if (configMetadata == null) {
-                configMetadata = buildConfigMap();
-            }
-            return configMetadata;
+    @TestVisible
+    private static Map<String, ObjectConfig> configMetadata;
+
+    /**
+     * Given the name of an SObject, returns the Config.  If one doesn't exist, returns a default config
+     */
+    public static ObjectConfig getObjectConfig(String sObjectName) {
+        if (configMetadata == null) {
+            configMetadata = buildConfigMap();
         }
-        set;
+
+        if (configMetadata.containsKey(sObjectName)) {
+            return configMetadata.get(sObjectName);
+        }
+        return new ObjectConfig(true, sObjectName);
     }
 
     @testVisible
@@ -24,8 +31,10 @@ global class TriggerConfigService {
                 Before_Update__c,
                 After_Update__c,
                 Trigger_Object__r.Object_API_Name__c,
-                Trigger_Object__r.Enabled__c
-            //Debug_Errors__c
+                Trigger_Object__r.Enabled__c,
+                On_Exception__c,
+                Create_Exception_Event__c,
+                On_Exception_Event_Handler__c
             FROM Trigger_Handler__mdt
             ORDER BY Execution_Order__c ASC
         ];
@@ -63,36 +72,15 @@ global class TriggerConfigService {
             handlers = new Map<String, HandlerConfig>{};
             handlerOrder = new List<String>{};
         }
-    }
 
-    global class HandlerConfig {
-        global String className;
-        global Boolean enabled;
-        global Decimal order;
-        global Boolean beforeInsert;
-        global Boolean afterInsert;
-        global Boolean beforeUpdate;
-        global Boolean afterUpdate;
-        global Boolean beforeDelete;
-        global Boolean afterDelete;
-        global Boolean afterUndelete;
-        global Boolean debugErrors;
+        global HandlerConfig getHandlerConfig(String className) {
+            if (handlers.containsKey(className)) {
+                return handlers.get(className);
+            }
 
-        global HandlerConfig() {
-        }
+            HandlerConfig defaultConfig = new HandlerConfig(className);
 
-        global HandlerConfig(Trigger_Handler__mdt th) {
-            className = th.Handler_Class__c.toLowerCase();
-            enabled = th.Enabled__c;
-            order = th.Execution_Order__c;
-            beforeInsert = th.Before_Insert__c;
-            afterInsert = th.After_Insert__c;
-            beforeUpdate = th.Before_Update__c;
-            afterUpdate = th.After_Update__c;
-            beforeDelete = th.Before_Delete__c;
-            afterDelete = th.After_Delete__c;
-            afterUndelete = th.After_Undelete__c;
-            debugErrors = false; // for now, always false until we test and implement
+            return defaultConfig;
         }
     }
 }

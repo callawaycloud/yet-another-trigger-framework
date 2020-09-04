@@ -7,7 +7,7 @@ trigger ContactMaster on Contact(
     before update,
     before delete
 ) {
-    TriggerHandler handler = new TriggerHandler();
+    Manager handler = new Manager();
     //handler.bind(TriggerHandler.Evt.beforeInsert, new Handler1());
     handler.manage();
 }

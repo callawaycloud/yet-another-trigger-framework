@@ -1,4 +1,4 @@
-public without sharing class Handler1 extends BaseTriggerHandler {
+public without sharing class Handler1 extends BaseHandler {
     public static integer runCount = 0;
     public void handle() {
         for (SObject sObj : context.newRecords) {

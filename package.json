@@ -1,14 +1,14 @@
 {
-    "name": "ccc_trigger_framework",
-    "private": true,
-    "version": "1.0.0",
-    "description": "CCC Trigger Framework",
-    "scripts": {
-        "pretty-all-apex": "npx prettier --write 'src/**/*.{trigger,cls}'",
-        "release": "sfdx force:package:version:create -p 'CCC Trigger Handler' -w 1000 -x"
-    },
-    "devDependencies": {
-        "prettier": "1.19.1",
-        "prettier-plugin-apex": "^1.0.0"
-    }
+  "name": "ccc_trigger_framework",
+  "private": true,
+  "version": "1.0.0",
+  "description": "CCC Trigger Framework",
+  "scripts": {
+    "pretty-all-apex": "npx prettier --write 'src/**/*.{trigger,cls}'",
+    "release": "sfdx force:package:version:create -p 'CCC Trigger Framework' -w 1000 -x"
+  },
+  "devDependencies": {
+    "prettier": "2.1.1",
+    "prettier-plugin-apex": "^1.6.0"
+  }
 }

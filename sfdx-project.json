@@ -5,7 +5,10 @@
             "path": "src",
             "default": true,
             "package": "CCC Trigger Framework",
-            "versionNumber": "1.0.6.NEXT"
+            "versionNumber": "1.1.0.NEXT"
+        },
+        {
+            "path": "support"
         }
     ],
     "sfdcLoginUrl": "https://login.salesforce.com",
@@ -23,6 +26,11 @@
         "CCC Trigger Framework@1.0.5-1": "04t1C000000xAehQAE",
         "CCC Trigger Framework@1.0.5-2": "04t1C000000xAemQAE",
         "CCC Trigger Framework@1.0.5-3": "04t1C000000xAerQAE",
-        "CCC Trigger Framework@1.0.6-1": "04t1C000000xAewQAE"
+        "CCC Trigger Framework@1.0.6-1": "04t1C000000xAewQAE",
+        "CCC Trigger Framework@1.1.0-1": "04t1C000000lIVlQAM",
+        "CCC Trigger Framework@1.1.0-2": "04t1C000000lIVqQAM",
+        "CCC Trigger Framework@1.1.0-3": "04t1C000000lIVvQAM",
+        "CCC Trigger Framework@1.1.0-4": "04t1C000000lIWeQAM",
+        "CCC Trigger Framework@1.1.0-5": "04t1C000000lIWoQAM"
     }
 }

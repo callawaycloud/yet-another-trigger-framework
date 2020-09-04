@@ -3,6 +3,7 @@ global class TriggerContext {
     global boolean isExecuting;
     global System.TriggerOperation operationType;
     global Integer size;
+
     global SObject[] newRecords;
     global Map<Id, SObject> newRecordMap;
     global SObject[] oldRecords;
@@ -14,6 +15,17 @@ global class TriggerContext {
     global Boolean isBefore = false;
     global Boolean isAfter = false;
     global Boolean isUndelete = false;
+
+    global String sObjectType {
+        get {
+            if (sObjectType == null) {
+                SObject firstRecord = isDelete ? oldRecords[0] : newRecords[0];
+                sObjectType = String.valueOf(firstRecord.getSObjectType()).toLowerCase();
+            }
+            return sObjectType;
+        }
+        set;
+    }
 
     @TestVisible
     private static boolean triggerCoverage = false;
