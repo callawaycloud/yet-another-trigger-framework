@@ -38,6 +38,10 @@ global class Manager {
      * @return instance of `this` for chaining
      */
     global Manager bind(System.TriggerOperation event, Handler eh) {
+        return bind(event, eh, false);
+    }
+
+    private Manager bind(System.TriggerOperation event, Handler eh, Boolean limitBinding) {
         HandlerConfig hc = triggerConfig.getHandlerConfig(Utils.getClassName(eh));
         hc.handler = eh;
 
@@ -57,7 +61,7 @@ global class Manager {
 
         if (disabled) {
             System.debug('Handler is disabled: ' + hc.className);
-        } else if (handlerNames.contains(hc.className)) {
+        } else if (limitBinding && handlerNames.contains(hc.className)) {
             System.debug('Already bound handler: ' + hc.className);
         } else {
             handlerNames.add(hc.className);
@@ -118,25 +122,25 @@ global class Manager {
             // DO we even need to bind all these events?
             //  Seems like we just need to bind for the current trigger context???
             if (handlerConfig.beforeInsert) {
-                bind(TriggerOperation.BEFORE_INSERT, handlerClass);
+                bind(TriggerOperation.BEFORE_INSERT, handlerClass, true);
             }
             if (handlerConfig.afterInsert) {
-                bind(TriggerOperation.AFTER_INSERT, handlerClass);
+                bind(TriggerOperation.AFTER_INSERT, handlerClass, true);
             }
             if (handlerConfig.beforeUpdate) {
-                bind(TriggerOperation.BEFORE_UPDATE, handlerClass);
+                bind(TriggerOperation.BEFORE_UPDATE, handlerClass, true);
             }
             if (handlerConfig.afterUpdate) {
-                bind(TriggerOperation.AFTER_UPDATE, handlerClass);
+                bind(TriggerOperation.AFTER_UPDATE, handlerClass, true);
             }
             if (handlerConfig.beforeDelete) {
-                bind(TriggerOperation.BEFORE_DELETE, handlerClass);
+                bind(TriggerOperation.BEFORE_DELETE, handlerClass, true);
             }
             if (handlerConfig.afterDelete) {
-                bind(TriggerOperation.AFTER_DELETE, handlerClass);
+                bind(TriggerOperation.AFTER_DELETE, handlerClass, true);
             }
             if (handlerConfig.afterUndelete) {
-                bind(TriggerOperation.AFTER_UNDELETE, handlerClass);
+                bind(TriggerOperation.AFTER_UNDELETE, handlerClass, true);
             }
         }
     }
