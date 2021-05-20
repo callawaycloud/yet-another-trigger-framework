@@ -36,14 +36,17 @@ At it's core, the concept is very simple:
 ### Handler
 
 ```java
-public class AccountGreeter implements YATF.Handler{
-  public void handle(){
+global class AccountGreeter implements YATF.Handler{
+  global void handle(){
     for(Account acc : (Account[]) Trigger.new){
       System.debug('Hello ' + acc.Name);
     }
   }
 }
 ```
+❓Why the 'global' access modifier❓
+-   In order to use the dynamic binding through custom metadata, you will need to set your access modifier for the handler classes to 'global'. This is because the trigger manager must actually create instances of your handler classes. Since this code lives inside of the YATF package, it will fail unless the class access is set to 'global'.
+-   The 'handle' method must be set to global for the same reason. The 'handle' method is being called within the manager code that lives in the YATF package, so without 'global' access the YATF package cannot see that method.
 
 ### Trigger
 
