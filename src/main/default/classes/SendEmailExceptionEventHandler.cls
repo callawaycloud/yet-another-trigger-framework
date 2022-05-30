@@ -12,12 +12,18 @@ global class SendEmailExceptionEventHandler implements ExceptionEventHandler {
     public String[] recipients;
 
     global void handleExceptionEvents(ExceptionEvent event) {
-        Id fromId = [SELECT Id FROM OrgWideEmailAddress WHERE Address = :fromEmailAddress].Id;
+        OrgWideEmailAddress[] owe = [SELECT Id FROM OrgWideEmailAddress WHERE Address = :fromEmailAddress LIMIT 1];
+        Id fromId;
+        if(!owe.isEmpty()){
+            fromId = owe[0].Id;
+        }
         if (recipients == null || recipients.size() == 0) {
             throw new SendEmailExceptionEventHandlerException('Must Specify recipients array');
         }
+        // need to hit the "createEmail" method for test coverage
+        List<Messaging.SingleEmailMessage> messages = new List<Messaging.SingleEmailMessage>{ createEmail(event, fromId) };
         if (!Test.isRunningTest()) {
-            Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ createEmail(event, fromId) });
+            Messaging.sendEmail(messages);
         }
     }
 

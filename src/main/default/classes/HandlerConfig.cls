@@ -26,7 +26,7 @@ global class HandlerConfig {
     global ExceptionStrategy onException;
     global Boolean createExceptionEvent;
     global String exceptionHandlerClassName;
-    // global Map<String, Object> additionalExceptionConfiguration;
+    //global Map<String, Object> additionalExceptionConfiguration; ** this is queried asynchronously from the mdt config **
 
     global HandlerConfig() {
     }
@@ -69,5 +69,9 @@ global class HandlerConfig {
 
         createExceptionEvent = th.Create_Exception_Event__c;
         exceptionHandlerClassName = th.On_Exception_Event_Handler__c;
+        // Currently not needed since this is queried later when handling the event
+        // if(th.On_Exception_Event_Handler_Props__c != null){
+        //     additionalExceptionConfiguration = (Map<String,Object>) JSON.deserializeUntyped(th.On_Exception_Event_Handler_Props__c);
+        // }
     }
 }

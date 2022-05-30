@@ -31,6 +31,10 @@
         <value xsi:type="xsd:boolean">true</value>
     </values>
     <values>
+        <field>Create_Exception_Event__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
         <field>Enabled__c</field>
         <value xsi:type="xsd:boolean">true</value>
     </values>
@@ -41,6 +45,21 @@
     <values>
         <field>Handler_Class__c</field>
         <value xsi:type="xsd:string">Handler2</value>
+    </values>
+    <values>
+        <field>On_Exception_Event_Handler_Props__c</field>
+        <value xsi:type="xsd:string">{
+&quot;fromEmailAddress&quot;: &quot;jake@callaway.cloud&quot;,
+&quot;recipients&quot;: [&quot;charlie@callaway.cloud&quot;, &quot;jake@callaway.cloud&quot;]
+}</value>
+    </values>
+    <values>
+        <field>On_Exception_Event_Handler__c</field>
+        <value xsi:type="xsd:string">SendEmailExceptionEventHandler</value>
+    </values>
+    <values>
+        <field>On_Exception__c</field>
+        <value xsi:type="xsd:string">Throw</value>
     </values>
     <values>
         <field>Trigger_Object__c</field>
