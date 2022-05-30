@@ -21,7 +21,7 @@ The goal of this project is to improve upon that concept, by adding additional c
 
 ## 📦Installation
 
--   [Package URL](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t6O000001J8v7QAC) (replace host as needed)
+-   [Package URL](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t6O000001J8vHQAS) (replace host as needed)
 
 -   command line: `sfdx force:package:install -p 04t1C000000lIX3QAM -u {TARGET ALIAS OR USERNAME} -b 1000 -w 1000`
 
