@@ -5,7 +5,7 @@
             "path": "src",
             "default": true,
             "package": "CCC Trigger Framework",
-            "versionNumber": "1.1.0.NEXT"
+            "versionNumber": "1.1.1.NEXT"
         },
         {
             "path": "support"

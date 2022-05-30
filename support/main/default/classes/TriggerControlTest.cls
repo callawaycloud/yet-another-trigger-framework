@@ -153,11 +153,49 @@ private class TriggerControlTest {
 
     @isTest
     private static void additionalCoverage() {
-        Map<String, TriggerConfigService.ObjectConfig> forceGet = TriggerConfigService.configMetadata;
-        Trigger_Object__mdt objMdt = new Trigger_Object__mdt(Object_API_Name__c = 'testerObj', Enabled__c = true);
-        // TriggerConfigService.ObjectConfig objConstructorTest = new TriggerConfigService.ObjectConfig(objMdt);
-        Trigger_Handler__mdt handlerMdt = new Trigger_Handler__mdt(Handler_Class__c = 'testerHandler');
-        HandlerConfig handlerConstructorTest = new HandlerConfig(handlerMdt);
+        Map<String, TriggerConfigService.ObjectConfig> mdt = buildMetadata();
+        TriggerConfigService.ObjectConfig objConfig = mdt.get('account');
+        HandlerConfig handlerConfig = generateHandlerTestData('handler2', true);
+        addChildHandlerToObj(objConfig, handlerConfig);
+        mdt.put('contact', objConfig);
+        TriggerConfigService.configMetadata = mdt;
+        // class should only run once - currently just debugs
+        Boolean acctHandler1Fired = true;
+        Boolean acctHandler2Fired = true;
+        Boolean contactHandler1Fired = true;
+        runTest(acctHandler1Fired, acctHandler2Fired, contactHandler1Fired);
+        // handler 1 should run once for account and once for contact
+        system.assertEquals(2, Handler1.runCount, 'Handler should only run once per object');
+    }
+
+    @isTest
+    private static void testExceptionHandling() {
+        // Map<String, TriggerConfigService.ObjectConfig> mdt = buildMetadata();
+        // TriggerConfigService.ObjectConfig objConfig = mdt.get('account');
+        // HandlerConfig hc = generateHandlerTestData('handler2', true);
+        // hc.createExceptionEvent = true;
+        // hc.onException = HandlerConfig.ExceptionStrategy.RETHROW;
+        // hc.exceptionHandlerClassName = 'SendEmailExceptionEventHandler';
+        // addChildHandlerToObj(objConfig, hc);
+        // mdt.put('account', objConfig);
+        // TriggerConfigService.configMetadata = mdt;
+
+        // Don't do any mdt setup - we need to auto bind with the handler2 config
+        Boolean hitException = false;
+        Test.startTest();
+        try{
+            Boolean acctHandler1Fired = true;
+            Boolean acctHandler2Fired = false;
+            Boolean contactHandler1Fired = true;
+            Handler2.throwException = true;
+            runTest(acctHandler1Fired, acctHandler2Fired, contactHandler1Fired);
+        } catch (Exception e) {
+            hitException = true;
+        }
+
+        Test.stopTest();
+
+        System.assertEquals(true, hitException, 'Should have had thrown exception');
     }
 
     private static void runTest(Boolean acctHandler1Fired, Boolean acctHandler2Fired, Boolean contactHandler1Fired) {

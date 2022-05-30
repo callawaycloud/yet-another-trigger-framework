@@ -88,6 +88,20 @@ public class TriggerManageTests {
         // cover the lines we can't really test without a trigger
         TriggerContext.triggerCoverage = true;
         TriggerContext tc = new TriggerContext();
+        TriggerConfigService.buildConfigMap();
+    }
+
+    @isTest
+    private static void testExceptionManager() {
+        // code coverage for exception manager class
+        ExceptionManager em = new ExceptionManager();
+        TestManagerException exc = new TestManagerException('test');
+        TriggerContext tc = new TriggerContext();
+        tc.sObjectType = 'testobj';
+
+        HandlerConfig hc = new HandlerConfig();
+        hc.createExceptionEvent = true;
+        em.manage(exc, tc, hc, null);
     }
 
     @isTest
@@ -123,7 +137,8 @@ public class TriggerManageTests {
         return trigObj;
     }
 
-    private static HandlerConfig generateHandlerTestData(String className, Boolean enabled) {
+    // used by other tests
+    public static HandlerConfig generateHandlerTestData(String className, Boolean enabled) {
         HandlerConfig handler = new HandlerConfig();
         handler.className = className;
         handler.enabled = enabled;
@@ -170,4 +185,5 @@ public class TriggerManageTests {
         mdt.put(objectName, obj);
         return mdt;
     }
+    public class TestManagerException extends Exception{}
 }

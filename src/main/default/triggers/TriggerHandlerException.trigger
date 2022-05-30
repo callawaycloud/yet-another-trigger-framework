@@ -14,8 +14,7 @@ trigger TriggerHandlerException on Trigger_Handler_Exception__e(after insert) {
         if (event.config.exceptionHandlerClassName == null) {
             continue;
         }
-
-        String handlerProps = evtHandlerPropsMap.get(e.Handler_Config_Id__c).On_Exception_Event_Handler_Props__c;
+        String handlerProps = evtHandlerPropsMap.get(e.Handler_Config_Id__c)?.On_Exception_Event_Handler_Props__c;
         try {
             ExceptionEventHandler evtHandler = (ExceptionEventHandler) Utils.constructFromName(
                 event.config.exceptionHandlerClassName,
